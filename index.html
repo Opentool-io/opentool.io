@@ -481,7 +481,7 @@ align-items:center;justify-content:center;gap:1rem;
       <div class="card-grid fade-in">
         <div class="card">
           <span class="card-label">shipped</span>
-          <h3 class="card-title">codexctl</h3>
+          <h3 class="card-title">OpenTool</h3>
           <p class="card-desc">The control plane. 20 UI surfaces, 17 engine modules, cross-platform.</p>
         </div>
         <div class="card">
@@ -551,7 +551,7 @@ align-items:center;justify-content:center;gap:1rem;
 
       <p>We started the session with 8 working sidebar routes and 5 orphaned components that led nowhere. By the end, every surface was live, tested, and the RBAC engine was blocking <code>rm -rf</code> in production.</p>
 
-      <p>This is the story of how we took codexctl from "impressive demo with dead links" to "every route works, every API responds, every guardrail fires." In about 30 minutes.</p>
+      <p>This is the story of how we took OpenTool from "impressive demo with dead links" to "every route works, every API responds, every guardrail fires." In about 30 minutes.</p>
 
       <h2>The Problem</h2>
 
@@ -687,10 +687,10 @@ $ npx playwright test --reporter=list
   <div class="app-page">
     <div class="app-hero fade-in">
       <h1>Connect to OpenTool</h1>
-      <p>Your local codexctl instance powers this page.</p>
+      <p>Your local OpenTool instance powers this page.</p>
       <div class="conn-status" id="connStatus">
         <span class="conn-dot" id="connDot"></span>
-        <span id="connText">Disconnected &mdash; Start codexctl-web on localhost:9900</span>
+        <span id="connText">Disconnected &mdash; Start OpenTool-web on localhost:9900</span>
       </div>
     </div>
 
@@ -723,18 +723,18 @@ $ npx playwright test --reporter=list
 
     <div class="arch-diagram fade-in">+-- GitHub Pages (this page) --+     +-- Your Machine ------------+
 |                              |     |                             |
-|  Static SPA                  | <-> |  codexctl-web :9900         |
+|  Static SPA                  | <-> |  OpenTool-web :9900         |
 |  Blog . Portfolio . App      |     |  RBAC . Registry . Chat     |
 |                              |     |  Ollama . Files . Tools     |
 +------------------------------+     +-----------------------------+</div>
 
     <div class="download-section fade-in">
-      <h2>Get codexctl</h2>
+      <h2>Get OpenTool</h2>
       <div class="platform-badges">
-        <a class="platform-badge" href="https://github.com/scoady/codexctl-next/releases" target="_blank" rel="noopener">macOS (arm64)</a>
-        <a class="platform-badge" href="https://github.com/scoady/codexctl-next/releases" target="_blank" rel="noopener">macOS (x64)</a>
-        <a class="platform-badge" href="https://github.com/scoady/codexctl-next/releases" target="_blank" rel="noopener">Linux (x64)</a>
-        <a class="platform-badge" href="https://github.com/scoady/codexctl-next/releases" target="_blank" rel="noopener">Windows (x64)</a>
+        <a class="platform-badge" href="https://github.com/Opentool-io/releases" target="_blank" rel="noopener">macOS (arm64)</a>
+        <a class="platform-badge" href="https://github.com/Opentool-io/releases" target="_blank" rel="noopener">macOS (x64)</a>
+        <a class="platform-badge" href="https://github.com/Opentool-io/releases" target="_blank" rel="noopener">Linux (x64)</a>
+        <a class="platform-badge" href="https://github.com/Opentool-io/releases" target="_blank" rel="noopener">Windows (x64)</a>
       </div>
     </div>
   </div>
@@ -744,7 +744,7 @@ $ npx playwright test --reporter=list
 <footer class="footer">
   <div class="footer-inner">
     <span>&copy; 2026 Sean Coady &middot; OpenTool</span>
-    <a href="https://github.com/scoady/codexctl-next" target="_blank" rel="noopener" aria-label="GitHub">
+    <a href="https://github.com/Opentool-io" target="_blank" rel="noopener" aria-label="GitHub">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
     </a>
   </div>
@@ -874,11 +874,11 @@ $ npx playwright test --reporter=list
       });
       if(r.ok){
         dot.classList.add('ok');
-        text.textContent = 'Connected to codexctl-web on localhost:9900';
+        text.textContent = 'Connected to OpenTool-web on localhost:9900';
       } else { throw 0; }
     }catch{
       dot.classList.remove('ok');
-      text.innerHTML = 'Disconnected &mdash; Start codexctl-web on localhost:9900';
+      text.innerHTML = 'Disconnected &mdash; Start OpenTool-web on localhost:9900';
     }
   }
   checkConnection();
