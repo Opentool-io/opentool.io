@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OpenTool — Governance for AI Development Tools</title>
+<meta name="description" content="Be deterministic about what won't happen. Open-source governance layer for AI development tools.">
+<meta property="og:title" content="OpenTool — AI Tool Governance">
+<meta property="og:description" content="Be deterministic about what won't happen. RBAC, capability gating, guardrails, and budget enforcement for AI agents.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://opentool.io">
+<meta property="og:image" content="https://opentool.io/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='80' fill='%238df1bd'>&#9670;</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#06080c;--surface:#0c0f16;--card:#11141d;
+--mint:#8df1bd;--lavender:#c39aff;
+--gradient:linear-gradient(135deg,#8df1bd 0%,#c39aff 100%);
+--text:#c8cdd5;--muted:#4a5568;--border:rgba(255,255,255,0.04);
+--sans:'Instrument Sans',system-ui,sans-serif;
+--mono:'JetBrains Mono',monospace;
+--max-w:1120px;--prose:680px;
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{
+background:var(--bg);color:var(--text);
+font-family:var(--sans);font-weight:400;
+line-height:1.7;-webkit-font-smoothing:antialiased;
+overflow-x:hidden;
+}
+body::before{
+content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+opacity:.035;
+background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+background-repeat:repeat;background-size:256px 256px;
+}
+::selection{background:rgba(141,241,189,0.15);color:#fff}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+
+/* ── NAV ── */
+.nav{
+position:fixed;top:0;left:0;right:0;z-index:100;
+padding:0 2rem;height:56px;
+display:flex;align-items:center;justify-content:space-between;
+transition:background .3s,backdrop-filter .3s;
+}
+.nav.scrolled{
+background:rgba(6,8,12,0.82);
+backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+border-bottom:1px solid var(--border);
+}
+.nav-wordmark{
+font-family:var(--mono);font-size:.875rem;letter-spacing:.06em;
+color:var(--text);opacity:.7;cursor:pointer;
+}
+.nav-links{display:flex;gap:2rem;align-items:center}
+.nav-links a{
+font-size:.8125rem;color:var(--muted);letter-spacing:.04em;
+transition:color .2s;
+}
+.nav-links a:hover,.nav-links a.active{color:var(--text)}
+.hamburger{
+display:none;background:none;border:none;cursor:pointer;
+width:24px;height:24px;position:relative;
+}
+.hamburger span{
+display:block;width:18px;height:1.5px;background:var(--muted);
+position:absolute;left:3px;transition:all .25s;
+}
+.hamburger span:nth-child(1){top:7px}
+.hamburger span:nth-child(2){top:12px}
+.hamburger span:nth-child(3){top:17px}
+.hamburger.open span:nth-child(1){transform:rotate(45deg);top:12px}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:rotate(-45deg);top:12px}
+.mobile-menu{
+display:none;position:fixed;inset:0;z-index:99;
+background:rgba(6,8,12,0.96);
+backdrop-filter:blur(20px);
+flex-direction:column;align-items:center;justify-content:center;gap:2.5rem;
+}
+.mobile-menu.open{display:flex}
+.mobile-menu a{
+font-size:1.25rem;color:var(--text);letter-spacing:.04em;
+}
+
+/* ── PAGES ── */
+.page{
+display:none;opacity:0;
+transition:opacity .35s ease;
+position:relative;z-index:1;
+min-height:100vh;
+}
+.page.active{display:block}
+.page.visible{opacity:1}
+
+/* ── HERO ── */
+.hero{
+min-height:100vh;display:flex;flex-direction:column;
+justify-content:center;align-items:center;
+padding:0 2rem;text-align:center;position:relative;
+}
+.hero-headline{
+font-family:var(--sans);font-weight:700;
+font-size:clamp(2rem,5.5vw,4rem);
+line-height:1.1;letter-spacing:-.03em;
+color:#e8ecf0;max-width:780px;
+margin-bottom:1.25rem;
+}
+.hero-sub{
+font-size:1rem;color:var(--muted);
+max-width:480px;line-height:1.6;
+margin-bottom:2.5rem;
+}
+.hero-actions{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin-bottom:4rem}
+.pill{
+font-size:.8125rem;font-family:var(--mono);
+padding:.5rem 1.25rem;border-radius:100px;
+border:1px solid rgba(255,255,255,0.06);
+color:var(--text);transition:border-color .25s,color .25s;
+cursor:pointer;
+}
+.pill:hover{border-color:rgba(141,241,189,0.25);color:#fff}
+.hero-stats{
+position:absolute;bottom:3rem;left:0;right:0;
+text-align:center;
+}
+.hero-stats .rule{
+width:80px;height:1px;background:var(--border);
+margin:0 auto 1.5rem;
+}
+.hero-stats span{
+font-family:var(--mono);font-size:.75rem;color:var(--muted);
+letter-spacing:.03em;
+}
+.hero-stats .sep{margin:0 .75rem;opacity:.3}
+
+/* ── SECTIONS ── */
+.section{padding:6rem 2rem}
+.section-inner{max-width:var(--max-w);margin:0 auto}
+.section-rule{
+width:100%;height:1px;background:var(--border);
+max-width:var(--max-w);margin:0 auto;
+}
+.prose{max-width:var(--prose);margin:0 auto}
+.prose p{margin-bottom:1.5rem;line-height:1.8}
+.section-label{
+font-family:var(--mono);font-size:.6875rem;
+color:var(--muted);letter-spacing:.1em;
+text-transform:uppercase;margin-bottom:2.5rem;
+}
+.section-title{
+font-family:var(--sans);font-weight:700;
+font-size:clamp(1.5rem,3vw,2.25rem);
+color:#e8ecf0;letter-spacing:-.02em;
+margin-bottom:1rem;line-height:1.2;
+}
+
+/* ── CARDS ── */
+.card-grid{
+display:grid;grid-template-columns:repeat(3,1fr);
+gap:1px;
+}
+.card{
+background:var(--card);padding:2.5rem 2rem;
+border:1px solid var(--border);
+transition:border-color .3s;
+}
+.card:hover{border-color:rgba(141,241,189,0.1)}
+.card-label{
+font-family:var(--mono);font-size:.625rem;
+color:var(--mint);letter-spacing:.1em;
+text-transform:uppercase;margin-bottom:1rem;
+opacity:.7;
+}
+.card-title{
+font-family:var(--sans);font-weight:600;
+font-size:1.125rem;color:#e8ecf0;
+margin-bottom:.75rem;
+}
+.card-desc{font-size:.875rem;color:var(--muted);line-height:1.6}
+
+/* ── BLOG LIST ── */
+.blog-list{max-width:720px;margin:0 auto;padding-top:6rem}
+.blog-card{
+padding:2.5rem 0;border-bottom:1px solid var(--border);
+cursor:pointer;transition:opacity .2s;
+}
+.blog-card:hover{opacity:.8}
+.blog-meta{
+font-family:var(--mono);font-size:.75rem;color:var(--muted);
+margin-bottom:.75rem;display:flex;gap:1.5rem;align-items:center;
+}
+.blog-card-title{
+font-family:var(--sans);font-weight:600;
+font-size:1.5rem;color:#e8ecf0;
+margin-bottom:.75rem;line-height:1.3;
+letter-spacing:-.01em;
+}
+.blog-excerpt{font-size:.9rem;color:var(--muted);line-height:1.6;margin-bottom:1rem}
+.tag{
+font-family:var(--mono);font-size:.625rem;
+padding:.25rem .625rem;border-radius:100px;
+border:1px solid var(--border);color:var(--muted);
+display:inline-block;margin-right:.5rem;
+letter-spacing:.03em;
+}
+
+/* ── BLOG POST ── */
+.blog-post{max-width:720px;margin:0 auto;padding-top:6rem}
+.blog-post-back{
+font-family:var(--mono);font-size:.75rem;color:var(--muted);
+margin-bottom:3rem;display:inline-block;
+transition:color .2s;
+}
+.blog-post-back:hover{color:var(--text)}
+.blog-post-title{
+font-family:var(--sans);font-weight:700;
+font-size:clamp(1.75rem,4vw,2.5rem);
+color:#e8ecf0;line-height:1.15;
+letter-spacing:-.025em;margin-bottom:1rem;
+}
+.blog-post-meta{
+font-family:var(--mono);font-size:.75rem;
+color:var(--muted);margin-bottom:3.5rem;
+padding-bottom:2rem;border-bottom:1px solid var(--border);
+display:flex;gap:1.5rem;
+}
+.blog-post .prose{max-width:100%}
+.blog-post .prose p{font-size:.9375rem;margin-bottom:1.5rem}
+.blog-post .prose h2{
+font-family:var(--sans);font-weight:600;
+font-size:1.25rem;color:#e8ecf0;
+margin:3rem 0 1rem;letter-spacing:-.01em;
+}
+.blog-post .prose h3{
+font-family:var(--sans);font-weight:600;
+font-size:1.0625rem;color:#dde1e7;
+margin:2rem 0 .75rem;
+}
+pre{
+background:var(--surface);
+border-left:2px solid rgba(141,241,189,0.3);
+padding:1.25rem 1.5rem;margin:1.5rem 0;
+border-radius:2px;overflow-x:auto;
+font-family:var(--mono);font-size:.8125rem;
+line-height:1.7;color:#9ca8b8;
+}
+code{font-family:var(--mono);font-size:.85em}
+.prose p code{
+background:var(--surface);padding:.125rem .375rem;
+border-radius:2px;font-size:.8125rem;
+}
+.pullquote{
+font-family:var(--sans);font-weight:600;
+font-size:1.375rem;line-height:1.4;
+margin:2.5rem 0;padding:1.5rem 0;
+background:var(--gradient);
+-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+background-clip:text;
+letter-spacing:-.01em;
+}
+
+/* ── ABOUT ── */
+.about-page{max-width:600px;margin:0 auto;padding-top:8rem;text-align:center}
+.about-avatar{
+width:140px;height:140px;border-radius:50%;
+background:var(--gradient);padding:2px;
+margin:0 auto 2rem;display:flex;align-items:center;justify-content:center;
+}
+.about-avatar-inner{
+width:100%;height:100%;border-radius:50%;
+background:var(--bg);display:flex;
+align-items:center;justify-content:center;
+font-family:var(--mono);font-size:1.5rem;
+color:var(--muted);letter-spacing:.05em;
+}
+.about-name{
+font-family:var(--sans);font-weight:700;
+font-size:2rem;color:#e8ecf0;
+letter-spacing:-.02em;margin-bottom:.5rem;
+}
+.about-title{
+font-family:var(--mono);font-size:.8125rem;
+color:var(--muted);margin-bottom:2.5rem;
+}
+.about-bio{text-align:left;margin-bottom:3rem}
+.about-bio p{margin-bottom:1.25rem;font-size:.9375rem;line-height:1.8}
+.about-links{
+display:flex;gap:1.5rem;justify-content:center;
+margin-bottom:2.5rem;
+}
+.about-links a{
+color:var(--muted);transition:color .2s;
+display:flex;align-items:center;justify-content:center;
+width:40px;height:40px;border-radius:50%;
+border:1px solid var(--border);
+}
+.about-links a:hover{color:var(--text);border-color:rgba(255,255,255,0.1)}
+.about-links svg{width:18px;height:18px}
+.about-email{
+font-family:var(--mono);font-size:.8125rem;color:var(--muted);
+}
+.about-email a{transition:color .2s}
+.about-email a:hover{color:var(--mint)}
+
+/* ── APP PAGE ── */
+.app-page{max-width:var(--max-w);margin:0 auto;padding-top:6rem}
+.app-hero{text-align:center;margin-bottom:4rem}
+.app-hero h1{
+font-family:var(--sans);font-weight:700;
+font-size:clamp(1.75rem,4vw,2.5rem);
+color:#e8ecf0;letter-spacing:-.02em;
+margin-bottom:.75rem;
+}
+.app-hero p{color:var(--muted);font-size:.9375rem}
+.conn-status{
+display:inline-flex;align-items:center;gap:.5rem;
+font-family:var(--mono);font-size:.75rem;
+color:var(--muted);margin-top:1.25rem;
+padding:.5rem 1rem;border-radius:100px;
+border:1px solid var(--border);
+}
+.conn-dot{
+width:6px;height:6px;border-radius:50%;
+background:#f87171;
+}
+.conn-dot.ok{background:var(--mint)}
+.feature-grid{
+display:grid;grid-template-columns:repeat(3,1fr);
+gap:1px;margin-bottom:4rem;
+}
+.feature-cell{
+background:var(--card);padding:2rem;
+border:1px solid var(--border);
+}
+.feature-cell h3{
+font-family:var(--sans);font-weight:600;
+font-size:.9375rem;color:#e8ecf0;
+margin-bottom:.5rem;
+}
+.feature-cell p{font-size:.8125rem;color:var(--muted);line-height:1.5}
+.arch-diagram{
+background:var(--surface);
+border:1px solid var(--border);
+padding:2rem;margin:0 auto 4rem;
+max-width:660px;
+font-family:var(--mono);font-size:.75rem;
+line-height:1.7;color:var(--muted);
+white-space:pre;overflow-x:auto;
+text-align:center;
+}
+.download-section{text-align:center;margin-bottom:4rem}
+.download-section h2{
+font-family:var(--sans);font-weight:600;
+font-size:1.25rem;color:#e8ecf0;
+margin-bottom:1.5rem;
+}
+.platform-badges{
+display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;
+}
+.platform-badge{
+font-family:var(--mono);font-size:.75rem;
+padding:.625rem 1.25rem;border-radius:4px;
+border:1px solid var(--border);color:var(--muted);
+transition:border-color .25s,color .25s;cursor:pointer;
+}
+.platform-badge:hover{border-color:rgba(141,241,189,0.2);color:var(--text)}
+
+/* ── LATEST BLOG CARD (home) ── */
+.latest-blog{
+max-width:var(--prose);margin:0 auto;
+padding:2.5rem;
+background:var(--card);border:1px solid var(--border);
+cursor:pointer;transition:border-color .3s;
+}
+.latest-blog:hover{border-color:rgba(141,241,189,0.1)}
+
+/* ── FOOTER ── */
+.footer{
+padding:3rem 2rem;text-align:center;
+border-top:1px solid var(--border);
+position:relative;z-index:1;
+}
+.footer-inner{
+font-family:var(--mono);font-size:.6875rem;
+color:var(--muted);display:flex;
+align-items:center;justify-content:center;gap:1rem;
+}
+.footer a{transition:color .2s}
+.footer a:hover{color:var(--text)}
+.footer svg{width:14px;height:14px}
+
+/* ── FADE-IN ── */
+.fade-in{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease}
+.fade-in.in-view{opacity:1;transform:translateY(0)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .nav-links{display:none}
+  .hamburger{display:block}
+  .card-grid,.feature-grid{grid-template-columns:1fr}
+  .hero-headline{font-size:clamp(1.75rem,7vw,2.5rem)}
+  .section{padding:4rem 1.25rem}
+  .hero{padding:0 1.25rem}
+  .hero-stats span{font-size:.6875rem}
+  .hero-stats .sep{margin:0 .35rem}
+  .blog-list,.blog-post{padding-left:1.25rem;padding-right:1.25rem}
+  .about-page{padding-left:1.25rem;padding-right:1.25rem}
+  .app-page{padding-left:1.25rem;padding-right:1.25rem}
+  .arch-diagram{font-size:.625rem;padding:1.25rem}
+}
+@media(max-width:480px){
+  .hero-stats span{font-size:.625rem}
+  .blog-card-title{font-size:1.25rem}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <span class="nav-wordmark" onclick="navigate('/')">OpenTool</span>
+  <div class="nav-links">
+    <a href="#blog" onclick="navigate('blog')">Blog</a>
+    <a href="#about" onclick="navigate('about')">About</a>
+    <a href="#app" onclick="navigate('app')">App</a>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#blog" onclick="navigate('blog');closeMobile()">Blog</a>
+  <a href="#about" onclick="navigate('about');closeMobile()">About</a>
+  <a href="#app" onclick="navigate('app');closeMobile()">App</a>
+</div>
+
+<!-- ═══════ HOME ═══════ -->
+<div class="page active" id="page-home">
+
+  <div class="hero">
+    <h1 class="hero-headline">Be deterministic about what won't happen.</h1>
+    <p class="hero-sub">The governance layer for AI development tools. Open source.</p>
+    <div class="hero-actions">
+      <a class="pill" href="#blog" onclick="navigate('blog')">Read the blog &rarr;</a>
+      <a class="pill" href="#app" onclick="navigate('app')">Try the app &rarr;</a>
+    </div>
+    <div class="hero-stats">
+      <div class="rule"></div>
+      <span>20 surfaces</span><span class="sep">&middot;</span>
+      <span>9 plugins</span><span class="sep">&middot;</span>
+      <span>188 tests</span><span class="sep">&middot;</span>
+      <span>3 platforms</span>
+    </div>
+  </div>
+
+  <div class="section-rule"></div>
+
+  <section class="section">
+    <div class="prose fade-in">
+      <p class="section-label">What is OpenTool?</p>
+      <p>AI tools are non-deterministic. You cannot control what they will generate, suggest, or attempt. But you <em>can</em> be deterministic about what they won't execute. That distinction matters more than most people realize.</p>
+      <p>OpenTool is an open-source framework for governing AI development tools. It gives you RBAC, capability gating, guardrails, budget enforcement, and a plugin registry &mdash; so every AI agent in your org operates within boundaries you define. Not after the fact. Before.</p>
+      <p>Think of it like OpenTelemetry for AI governance. A shared foundation that enterprise platforms build on. The plumbing that makes "AI in production" mean something other than "fingers crossed."</p>
+    </div>
+  </section>
+
+  <div class="section-rule"></div>
+
+  <section class="section">
+    <div class="section-inner">
+      <p class="section-label fade-in">Featured</p>
+      <div class="card-grid fade-in">
+        <div class="card">
+          <span class="card-label">shipped</span>
+          <h3 class="card-title">codexctl</h3>
+          <p class="card-desc">The control plane. 20 UI surfaces, 17 engine modules, cross-platform.</p>
+        </div>
+        <div class="card">
+          <span class="card-label">shipped</span>
+          <h3 class="card-title">Plugin Registry</h3>
+          <p class="card-desc">9 packages. Release channels. One-click promote from dev to staging to prod.</p>
+        </div>
+        <div class="card">
+          <span class="card-label">shipped</span>
+          <h3 class="card-title">RBAC Engine</h3>
+          <p class="card-desc">Entity &rarr; Role &rarr; Capability. Budget enforcement. Guardrail evaluation. 22 unit tests.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-rule"></div>
+
+  <section class="section">
+    <div class="section-inner">
+      <p class="section-label fade-in">Latest from the blog</p>
+      <div class="latest-blog fade-in" onclick="navigate('blog-post-qa')">
+        <div class="blog-meta">
+          <span>April 2026</span>
+          <span>8 min read</span>
+        </div>
+        <h3 class="blog-card-title">How We QA'd 20 UI Surfaces in One Session</h3>
+        <p class="blog-excerpt">We started the session with 8 working sidebar routes and 5 orphaned components that led nowhere. By the end, every surface was live, tested, and the RBAC engine was blocking <code>rm -rf</code> in production.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ═══════ BLOG ═══════ -->
+<div class="page" id="page-blog">
+  <div class="blog-list">
+    <p class="section-label">Blog</p>
+
+    <div class="blog-card" onclick="navigate('blog-post-qa')">
+      <div class="blog-meta">
+        <span>April 2026</span>
+        <span>8 min read</span>
+      </div>
+      <h3 class="blog-card-title">How We QA'd 20 UI Surfaces in One Session</h3>
+      <p class="blog-excerpt">We started the session with 8 working sidebar routes and 5 orphaned components that led nowhere. By the end, every surface was live, tested, and the RBAC engine was blocking <code>rm -rf</code> in production.</p>
+      <span class="tag">engineering</span>
+      <span class="tag">qa</span>
+      <span class="tag">rbac</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════ BLOG POST ═══════ -->
+<div class="page" id="page-blog-post-qa">
+  <div class="blog-post">
+    <a class="blog-post-back" href="#blog" onclick="navigate('blog')">&larr; Back to blog</a>
+    <h1 class="blog-post-title">How We QA'd 20 UI Surfaces in One Session</h1>
+    <div class="blog-post-meta">
+      <span>April 2026</span>
+      <span>8 min read</span>
+      <span>Sean Coady</span>
+    </div>
+
+    <div class="prose">
+
+      <p>We started the session with 8 working sidebar routes and 5 orphaned components that led nowhere. By the end, every surface was live, tested, and the RBAC engine was blocking <code>rm -rf</code> in production.</p>
+
+      <p>This is the story of how we took codexctl from "impressive demo with dead links" to "every route works, every API responds, every guardrail fires." In about 30 minutes.</p>
+
+      <h2>The Problem</h2>
+
+      <p>When we sat down to audit the codebase, the picture wasn't great. Five UI workbenches &mdash; Benchmark, Drift Monitor, Architecture Map, Session Replay, and Provenance Tracker &mdash; existed as fully built React components. Good code. Proper state management. But they had no routes. Nothing linked to them. They were dead code sitting in <code>src/components/</code>, invisible to anyone who actually launched the app.</p>
+
+      <p>The agent chat surface had full SSE (Server-Sent Events) plumbing. WebSocket fallback. Streaming token display. But nobody had tested it end-to-end against a real backend. It rendered, technically, but the first message would silently fail and the UI would just... sit there.</p>
+
+      <p>Meanwhile, the sidebar showed 8 items. The app actually had 20 distinct surfaces. More than half the product was hidden.</p>
+
+      <h2>The Fix (30 Minutes)</h2>
+
+      <p>The approach was systematic. No heroics, no rewrites. Just wiring.</p>
+
+      <p>First, every orphaned component got a route in <code>App.tsx</code>. We added all 12 missing paths and confirmed each one rendered without crashing. Some needed props that previously came from nowhere &mdash; those got default values.</p>
+
+      <p>Second, we added backend API stubs. Not mocks. Actual Express handlers that return valid JSON with realistic shapes, so components degrade gracefully even when the real engine isn't running. The stub for <code>/api/benchmark/results</code> returns three sample runs with timestamps and percentile data. The stub for <code>/api/drift</code> returns a config diff. Real enough to test against, light enough to ship as defaults.</p>
+
+      <p>Third, the sidebar went from a flat list of 8 items to 20 routes organized into three groups: Primary, Analytics, and System.</p>
+
+<pre>
+# Before: 8 sidebar items, 5 orphaned components
+# After: 20 routes, zero dead links, 31 Playwright tests
+
+$ npx playwright test
+  31 passed (4.0s)
+</pre>
+
+      <p>Every route resolves. Every API endpoint returns valid JSON. Every component renders without errors. That's the baseline &mdash; not impressive, just correct. The kind of correct that most products skip.</p>
+
+      <h2>The RBAC Engine</h2>
+
+      <p>With the UI stable, we turned to the part that actually matters: the authorization layer.</p>
+
+      <p>We built <code>src/engine/auth.rs</code> from scratch. Three core functions: <code>check_capability</code>, <code>check_budget</code>, and <code>evaluate_guardrails</code>. Each one is pure &mdash; takes an entity, a set of rules, and a context, and returns an allow/deny decision with a reason. No side effects. No database calls. Just logic.</p>
+
+      <p>Then we wired it into the web API and tested it:</p>
+
+<pre>
+# Alice tries to edit a file — allowed
+$ curl -X POST /api/auth/check \
+  -d '{"entity_id":"dev-alice","capability_id":"file-write"}'
+{"decision":"allow"}
+
+# Alice tries rm -rf — guardrail blocks it
+$ curl -X POST /api/auth/check \
+  -d '{"entity_id":"dev-alice","capability_id":"shell","action":"rm -rf /"}'
+{"decision":"deny","reason":"guardrail: Confirm before executing destructive commands"}
+</pre>
+
+      <p class="pullquote">That's the core thesis: you can't control what an AI will generate. But you CAN be deterministic about what it won't execute.</p>
+
+      <p>The guardrail engine evaluates a chain of rules. Each rule has a pattern (regex or glob), a severity level, and an action (deny, warn, or require-confirmation). Rules compose. The most restrictive match wins. If no rule matches, the default capability grant applies.</p>
+
+      <p>We wrote 22 unit tests for the auth module alone. Edge cases matter here &mdash; what happens when an entity has two roles with conflicting grants? What if a budget is exactly at the limit? What about nested capability inheritance? Every case has a test. Every test has a name that describes the scenario in plain language.</p>
+
+      <h2>The Plugin System</h2>
+
+      <p>The doc-manager plugin went from concept to working package in one pass. It ships with resource specs (what file types it manages), routing rules (which requests it intercepts), and format linting (it rejects malformed documents before they hit the engine).</p>
+
+      <p>The interesting part: it includes the first-ever <code>team.json</code> &mdash; a manifest that declares what agent personas a plugin needs to operate. The doc-manager needs a "reviewer" persona (can read and comment) and an "editor" persona (can read, write, and restructure). When you install the plugin, the RBAC engine automatically provisions these personas and binds them to the roles you've configured.</p>
+
+      <p>That's the plugin contract. You declare your needs, the platform provisions them, and your plugin never has to think about auth again. It just works within the boundaries the org has set.</p>
+
+      <h2>The Testing Philosophy</h2>
+
+      <p>Every route gets a Playwright test. Not as an afterthought. Not because someone filed a ticket. The test is the proof that the thing works. If there's no test, it doesn't ship.</p>
+
+      <p>Our visual-qa suite does three things:</p>
+
+      <p>First, it navigates to each of the 20 sidebar routes and confirms the page renders without console errors. Simple, but you'd be surprised how many shipped products fail this check.</p>
+
+      <p>Second, it hits every API endpoint and validates the response is well-formed JSON with the expected top-level keys. Not deep schema validation &mdash; just enough to catch the "endpoint returns HTML error page instead of JSON" class of bugs.</p>
+
+      <p>Third, it screenshots every surface at three viewport widths: 1440px, 768px, and 375px. These screenshots go into a <code>qa-evidence/</code> directory that we review before every release. Not automated visual diffing (yet) &mdash; just a human looking at 60 screenshots and checking that nothing is obviously broken.</p>
+
+<pre>
+$ npx playwright test --reporter=list
+
+  ✓ sidebar renders 20 routes (1.2s)
+  ✓ api/auth/check returns valid response (0.3s)
+  ✓ api/plugins/list returns array (0.2s)
+  ✓ api/budget/status returns current spend (0.2s)
+  ✓ agent chat SSE streams tokens (0.8s)
+  ...
+  31 passed (4.0s)
+</pre>
+
+      <h2>What This Means</h2>
+
+      <p>If you're running AI agents in production &mdash; Claude Code, Cursor, Copilot, whatever &mdash; and you don't have a governance layer, here's what you're betting on: that every prompt, every tool call, every file operation will be benign. Every time. Across every developer. Across every agent session.</p>
+
+      <p>That bet fails eventually. One bad prompt deletes a production database. One leaked context window exposes credentials. One runaway loop burns through your API budget in twenty minutes. These aren't hypotheticals. They're incident reports we've read.</p>
+
+      <p>OpenTool is the layer that sits between the agent and the action. It doesn't slow anything down &mdash; capability checks take microseconds. It doesn't require you to change how you work. It just ensures that the things that must not happen, don't happen.</p>
+
+      <p>Open source. Local-first. And now, tested across every surface.</p>
+
+      <p>We're building in the open. The repo is live. The tests are green. Come break things.</p>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ ABOUT ═══════ -->
+<div class="page" id="page-about">
+  <div class="about-page">
+    <div class="about-avatar fade-in">
+      <div class="about-avatar-inner">SC</div>
+    </div>
+    <h1 class="about-name fade-in">Sean Coady</h1>
+    <p class="about-title fade-in">Builder &middot; Engineer &middot; Founder</p>
+    <div class="about-bio fade-in">
+      <p>I build tools that make AI safe to use in production. After watching too many companies get burned by uncontrolled AI agents &mdash; deleted databases, leaked credentials, runaway costs &mdash; I decided to build the governance layer that should have existed from day one.</p>
+      <p>OpenTool is the result. An open-source framework for controlling what AI can and can't do in your development workflow. I believe the AI tools market needs its "OpenTelemetry moment" &mdash; a shared foundation that every platform can build on. That's what we're building.</p>
+    </div>
+    <div class="about-links fade-in">
+      <a href="https://github.com/scoady" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+      </a>
+      <a href="https://linkedin.com/in/seancoady" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+      <a href="https://x.com/seancoady" target="_blank" rel="noopener" aria-label="X">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l11.733 16H20L8.267 4H4z"></path><path d="M4 20l6.768-6.768M13.232 10.768L20 4"></path></svg>
+      </a>
+    </div>
+    <p class="about-email fade-in">Get in touch &mdash; <a href="mailto:hello@opentool.io">hello@opentool.io</a></p>
+  </div>
+</div>
+
+<!-- ═══════ APP ═══════ -->
+<div class="page" id="page-app">
+  <div class="app-page">
+    <div class="app-hero fade-in">
+      <h1>Connect to OpenTool</h1>
+      <p>Your local codexctl instance powers this page.</p>
+      <div class="conn-status" id="connStatus">
+        <span class="conn-dot" id="connDot"></span>
+        <span id="connText">Disconnected &mdash; Start codexctl-web on localhost:9900</span>
+      </div>
+    </div>
+
+    <div class="feature-grid fade-in">
+      <div class="feature-cell">
+        <h3>RBAC &amp; Capability Gating</h3>
+        <p>Entity-to-role-to-capability mapping with inheritance and conflict resolution.</p>
+      </div>
+      <div class="feature-cell">
+        <h3>Plugin Registry</h3>
+        <p>9 packages across release channels. Version pinning, dependency resolution, one-click promote.</p>
+      </div>
+      <div class="feature-cell">
+        <h3>Agent Cost Tracking</h3>
+        <p>Per-entity budget enforcement. Real-time spend dashboards. Hard and soft limits.</p>
+      </div>
+      <div class="feature-cell">
+        <h3>Guardrail Engine</h3>
+        <p>Pattern-matching rule chains. Deny, warn, or require-confirmation. Most restrictive wins.</p>
+      </div>
+      <div class="feature-cell">
+        <h3>Multi-Provider Routing</h3>
+        <p>OpenAI, Anthropic, Ollama. Priority-based fallback. Cost-aware model selection.</p>
+      </div>
+      <div class="feature-cell">
+        <h3>Audit Trail</h3>
+        <p>Every decision logged. Every tool call recorded. Exportable. Queryable. Immutable.</p>
+      </div>
+    </div>
+
+    <div class="arch-diagram fade-in">+-- GitHub Pages (this page) --+     +-- Your Machine ------------+
+|                              |     |                             |
+|  Static SPA                  | <-> |  codexctl-web :9900         |
+|  Blog . Portfolio . App      |     |  RBAC . Registry . Chat     |
+|                              |     |  Ollama . Files . Tools     |
++------------------------------+     +-----------------------------+</div>
+
+    <div class="download-section fade-in">
+      <h2>Get codexctl</h2>
+      <div class="platform-badges">
+        <a class="platform-badge" href="https://github.com/scoady/codexctl-next/releases" target="_blank" rel="noopener">macOS (arm64)</a>
+        <a class="platform-badge" href="https://github.com/scoady/codexctl-next/releases" target="_blank" rel="noopener">macOS (x64)</a>
+        <a class="platform-badge" href="https://github.com/scoady/codexctl-next/releases" target="_blank" rel="noopener">Linux (x64)</a>
+        <a class="platform-badge" href="https://github.com/scoady/codexctl-next/releases" target="_blank" rel="noopener">Windows (x64)</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <span>&copy; 2026 Sean Coady &middot; OpenTool</span>
+    <a href="https://github.com/scoady/codexctl-next" target="_blank" rel="noopener" aria-label="GitHub">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+    </a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // ── ROUTING ──
+  const pages = {
+    '/':'page-home', 'home':'page-home',
+    'blog':'page-blog',
+    'blog-post-qa':'page-blog-post-qa',
+    'about':'page-about',
+    'app':'page-app'
+  };
+
+  function navigate(route, pushState){
+    if(route.startsWith('#')) route = route.slice(1);
+    if(route === '' || route === '/') route = '/';
+    const pageId = pages[route] || pages['/'];
+
+    document.querySelectorAll('.page').forEach(p=>{
+      p.classList.remove('visible');
+      setTimeout(()=>{ p.classList.remove('active'); }, 350);
+    });
+
+    setTimeout(()=>{
+      document.querySelectorAll('.page').forEach(p=> p.classList.remove('active'));
+      const target = document.getElementById(pageId);
+      if(target){
+        target.classList.add('active');
+        requestAnimationFrame(()=>{
+          requestAnimationFrame(()=> target.classList.add('visible'));
+        });
+      }
+      window.scrollTo({top:0,behavior:'instant'});
+      updateNav(route);
+      observeFadeIns();
+    }, 200);
+
+    if(pushState !== false){
+      history.pushState(null, '', '#' + (route === '/' ? '' : route));
+    }
+  }
+
+  function updateNav(route){
+    document.querySelectorAll('.nav-links a').forEach(a=>{
+      const href = a.getAttribute('href').replace('#','');
+      a.classList.toggle('active', href === route || (route === '/' && href === ''));
+    });
+  }
+
+  window.navigate = navigate;
+
+  // ── HASH CHANGE ──
+  window.addEventListener('hashchange', ()=>{
+    const hash = location.hash.slice(1) || '/';
+    navigate(hash, false);
+  });
+
+  // ── INIT ──
+  const initHash = location.hash.slice(1) || '/';
+  const initPageId = pages[initHash] || pages['/'];
+  const initPage = document.getElementById(initPageId);
+  if(initPage){
+    initPage.classList.add('active');
+    requestAnimationFrame(()=> initPage.classList.add('visible'));
+  }
+  updateNav(initHash);
+
+  // ── SCROLL NAV ──
+  const nav = document.getElementById('nav');
+  let ticking = false;
+  window.addEventListener('scroll', ()=>{
+    if(!ticking){
+      requestAnimationFrame(()=>{
+        nav.classList.toggle('scrolled', window.scrollY > 40);
+        ticking = false;
+      });
+      ticking = true;
+    }
+  },{passive:true});
+
+  // ── MOBILE MENU ──
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  hamburger.addEventListener('click', ()=>{
+    hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+  });
+  window.closeMobile = function(){
+    hamburger.classList.remove('open');
+    mobileMenu.classList.remove('open');
+  };
+
+  // ── INTERSECTION OBSERVER ──
+  function observeFadeIns(){
+    const els = document.querySelectorAll('.fade-in:not(.in-view)');
+    if(!els.length) return;
+    const obs = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){
+          e.target.classList.add('in-view');
+          obs.unobserve(e.target);
+        }
+      });
+    },{threshold:0.1,rootMargin:'0px 0px -40px 0px'});
+    els.forEach(el=> obs.observe(el));
+  }
+  observeFadeIns();
+
+  // ── CONNECTION CHECK ──
+  async function checkConnection(){
+    const dot = document.getElementById('connDot');
+    const text = document.getElementById('connText');
+    try{
+      const r = await fetch('http://localhost:9900/api/health',{
+        mode:'cors',signal:AbortSignal.timeout(2000)
+      });
+      if(r.ok){
+        dot.classList.add('ok');
+        text.textContent = 'Connected to codexctl-web on localhost:9900';
+      } else { throw 0; }
+    }catch{
+      dot.classList.remove('ok');
+      text.innerHTML = 'Disconnected &mdash; Start codexctl-web on localhost:9900';
+    }
+  }
+  checkConnection();
+  setInterval(checkConnection, 8000);
+
+})();
+</script>
+
+</body>
+</html>
