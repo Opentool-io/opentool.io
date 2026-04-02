@@ -191,14 +191,11 @@ img{display:block;max-width:100%}
    PAGE TRANSITIONS
    ══════════════════════════════════════════════ */
 .page{
-  display:none;opacity:0;transform:translateY(20px);
-  transition:opacity .5s cubic-bezier(0.16,1,0.3,1),
-             transform .5s cubic-bezier(0.16,1,0.3,1);
+  display:none;
   position:relative;z-index:1;
   min-height:100vh;
 }
-.page.active{display:block}
-.page.visible{opacity:1;transform:translateY(0)}
+.page.active{display:block;opacity:1}
 
 /* ══════════════════════════════════════════════
    HERO — Full viewport, animated mesh bg
@@ -925,6 +922,179 @@ code{font-family:var(--mono);font-size:.85em}
 .arch-terminal-body .t-mint{color:var(--mint)}
 .arch-terminal-body .t-lav{color:var(--lavender)}
 
+/* ══════════════════════════════════════════════
+   INTERACTIVE DEMOS
+   ══════════════════════════════════════════════ */
+.demos-section{margin-bottom:4rem}
+.demos-section h2{
+  font-family:var(--sans);font-weight:700;
+  font-size:clamp(1.5rem,3vw,2rem);
+  text-align:center;margin-bottom:.5rem;
+  background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.demos-section>p{
+  text-align:center;color:var(--muted);font-size:.875rem;margin-bottom:2.5rem;
+}
+.demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.demo-panel{
+  background:var(--card);backdrop-filter:blur(20px);
+  border:1px solid var(--border);border-radius:12px;
+  padding:1.75rem;position:relative;overflow:hidden;
+  transition:border-color .3s;
+}
+.demo-panel:hover{border-color:rgba(141,241,189,0.12)}
+.demo-panel.full-width{grid-column:1 / -1}
+.demo-panel-label{
+  font-family:var(--mono);font-size:.625rem;letter-spacing:.12em;
+  color:var(--mint);text-transform:uppercase;margin-bottom:.75rem;
+  display:flex;align-items:center;gap:.5rem;
+}
+.demo-panel-label::before{
+  content:'';display:inline-block;width:6px;height:6px;
+  border-radius:50%;background:var(--mint);
+  box-shadow:0 0 8px rgba(141,241,189,0.4);
+}
+.demo-panel h3{
+  font-family:var(--sans);font-weight:600;font-size:1rem;
+  color:var(--bright);margin-bottom:1rem;
+}
+.rbac-controls{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem}
+.rbac-select{
+  flex:1;min-width:140px;background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;padding:.625rem .875rem;
+  font-family:var(--mono);font-size:.75rem;color:var(--bright);cursor:pointer;
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%234a5568'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right .75rem center;
+  transition:border-color .2s;
+}
+.rbac-select:focus{outline:none;border-color:rgba(141,241,189,0.3)}
+.rbac-select option{background:var(--surface);color:var(--bright)}
+.rbac-btn{
+  background:rgba(141,241,189,0.08);border:1px solid rgba(141,241,189,0.2);
+  border-radius:8px;padding:.625rem 1.25rem;
+  font-family:var(--mono);font-size:.75rem;color:var(--mint);cursor:pointer;
+  transition:all .2s;white-space:nowrap;
+}
+.rbac-btn:hover{background:rgba(141,241,189,0.15);border-color:rgba(141,241,189,0.4)}
+.rbac-result{
+  border-radius:8px;padding:1rem 1.25rem;font-family:var(--mono);font-size:.8125rem;
+  line-height:1.6;min-height:72px;
+  transition:all .35s cubic-bezier(0.16,1,0.3,1);
+  border:1px solid var(--border);background:var(--surface);
+}
+.rbac-result.allow{border-color:rgba(141,241,189,0.3);background:rgba(141,241,189,0.04)}
+.rbac-result.deny{border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.04)}
+.rbac-verdict{font-weight:700;font-size:.875rem;margin-bottom:.25rem}
+.rbac-verdict.allow{color:#8df1bd}
+.rbac-verdict.deny{color:#f87171}
+.rbac-reason{color:var(--muted);font-size:.75rem}
+.rbac-role-tag{
+  display:inline-block;font-family:var(--mono);font-size:.625rem;
+  padding:.15rem .5rem;border-radius:4px;margin-right:.375rem;margin-bottom:.25rem;
+  border:1px solid rgba(195,154,255,0.2);color:var(--lavender);background:rgba(195,154,255,0.04);
+}
+.rbac-cap-list{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.375rem}
+.rbac-cap{
+  font-family:var(--mono);font-size:.5625rem;padding:.1rem .4rem;border-radius:3px;
+  background:rgba(141,241,189,0.06);color:var(--muted);border:1px solid rgba(255,255,255,0.04);
+}
+.guard-input-wrap{position:relative;margin-bottom:1rem}
+.guard-input{
+  width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  padding:.75rem 1rem .75rem 2.25rem;font-family:var(--mono);font-size:.8125rem;
+  color:var(--bright);transition:border-color .2s;
+}
+.guard-input:focus{outline:none;border-color:rgba(141,241,189,0.3)}
+.guard-input::placeholder{color:var(--muted)}
+.guard-input-icon{
+  position:absolute;left:.75rem;top:50%;transform:translateY(-50%);
+  color:var(--muted);font-size:.875rem;pointer-events:none;transition:color .2s;
+}
+.guard-input-wrap.blocked .guard-input{border-color:rgba(248,113,113,0.4)}
+.guard-input-wrap.blocked .guard-input-icon{color:#f87171}
+.guard-input-wrap.allowed .guard-input{border-color:rgba(141,241,189,0.3)}
+.guard-input-wrap.allowed .guard-input-icon{color:#8df1bd}
+.guard-result{
+  border-radius:8px;padding:.875rem 1rem;font-family:var(--mono);font-size:.75rem;
+  line-height:1.6;min-height:56px;border:1px solid var(--border);background:var(--surface);
+  transition:all .25s cubic-bezier(0.16,1,0.3,1);
+}
+.guard-result.blocked{border-color:rgba(248,113,113,0.25);background:rgba(248,113,113,0.04)}
+.guard-result.allowed{border-color:rgba(141,241,189,0.25);background:rgba(141,241,189,0.04)}
+.guard-status{font-weight:700;margin-bottom:.25rem}
+.guard-status.blocked{color:#f87171}
+.guard-status.allowed{color:#8df1bd}
+.guard-rule{color:var(--muted);font-size:.6875rem}
+.guard-examples{display:flex;flex-wrap:wrap;gap:.375rem;margin-top:.75rem}
+.guard-example{
+  font-family:var(--mono);font-size:.625rem;padding:.25rem .5rem;border-radius:4px;cursor:pointer;
+  border:1px solid var(--border);color:var(--muted);background:rgba(12,15,22,0.5);transition:all .2s;
+}
+.guard-example:hover{border-color:rgba(141,241,189,0.2);color:var(--bright)}
+.guard-example.danger{border-color:rgba(248,113,113,0.15)}
+.guard-example.safe{border-color:rgba(141,241,189,0.1)}
+.cost-display{margin-bottom:1.25rem}
+.cost-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.625rem}
+.cost-amount{
+  font-family:var(--mono);font-weight:700;font-size:1.5rem;color:var(--bright);transition:color .3s;
+}
+.cost-amount.warn{color:#f5a623}
+.cost-amount.deny{color:#f87171}
+.cost-budget-label{font-family:var(--mono);font-size:.6875rem;color:var(--muted)}
+.cost-bar-track{
+  width:100%;height:8px;border-radius:4px;
+  background:rgba(255,255,255,0.04);overflow:hidden;position:relative;
+}
+.cost-bar-fill{
+  height:100%;border-radius:4px;background:var(--mint);
+  transition:width .15s linear, background .3s;position:relative;
+}
+.cost-bar-fill.warn{background:#f5a623}
+.cost-bar-fill.deny{background:#f87171}
+.cost-bar-fill::after{
+  content:'';position:absolute;right:0;top:0;bottom:0;width:20px;border-radius:4px;
+  background:inherit;filter:brightness(1.3);opacity:0.6;
+}
+.cost-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1rem}
+.cost-metric{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;padding:.625rem .75rem;text-align:center;
+}
+.cost-metric-val{font-family:var(--mono);font-weight:600;font-size:.8125rem;color:var(--bright);margin-bottom:.125rem}
+.cost-metric-label{font-family:var(--mono);font-size:.5625rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.cost-controls{display:flex;gap:.5rem;flex-wrap:wrap}
+.cost-btn{
+  font-family:var(--mono);font-size:.6875rem;padding:.5rem 1rem;border-radius:6px;cursor:pointer;
+  border:1px solid var(--border);color:var(--muted);background:transparent;transition:all .2s;
+}
+.cost-btn:hover{border-color:rgba(141,241,189,0.2);color:var(--bright)}
+.cost-btn.active{border-color:rgba(141,241,189,0.3);color:var(--mint);background:rgba(141,241,189,0.06)}
+.cost-alert{
+  margin-top:.75rem;padding:.5rem .75rem;border-radius:6px;
+  font-family:var(--mono);font-size:.6875rem;
+  opacity:0;max-height:0;overflow:hidden;
+  transition:all .3s cubic-bezier(0.16,1,0.3,1);
+}
+.cost-alert.visible{opacity:1;max-height:60px;margin-top:.75rem}
+.cost-alert.warn{color:#f5a623;border:1px solid rgba(245,166,35,0.2);background:rgba(245,166,35,0.04)}
+.cost-alert.deny{color:#f87171;border:1px solid rgba(248,113,113,0.2);background:rgba(248,113,113,0.04)}
+.cost-log{
+  margin-top:.75rem;max-height:80px;overflow-y:auto;
+  font-family:var(--mono);font-size:.5625rem;color:var(--muted);line-height:1.7;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.06) transparent;
+}
+.cost-log::-webkit-scrollbar{width:4px}
+.cost-log::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:2px}
+@media(max-width:900px){
+  .demo-grid{grid-template-columns:1fr}
+  .demo-panel.full-width{grid-column:1}
+}
+@media(max-width:768px){
+  .cost-metrics{grid-template-columns:1fr}
+  .rbac-controls{flex-direction:column}
+}
+
 /* Download section */
 .download-section{text-align:center;margin-bottom:4rem}
 .download-section h2{
@@ -1041,7 +1211,7 @@ code{font-family:var(--mono);font-size:.85em}
 
 <!-- NAV -->
 <nav class="nav" id="nav">
-  <span class="nav-wordmark" onclick="navigate('/')"><span class="diamond">&#9670;</span>OpenTool</span>
+  <a class="nav-wordmark" href="#"><span class="diamond">&#9670;</span>OpenTool</a>
   <div class="nav-links">
     <a href="#blog">Blog</a>
     <a href="#about">About</a>
@@ -1053,9 +1223,9 @@ code{font-family:var(--mono);font-size:.85em}
 </nav>
 
 <div class="mobile-menu" id="mobileMenu">
-  <a href="#blog" onclick="closeMobile()">Blog</a>
-  <a href="#about" onclick="closeMobile()">About</a>
-  <a href="#app" onclick="closeMobile()">App</a>
+  <a href="#blog">Blog</a>
+  <a href="#about">About</a>
+  <a href="#app">App</a>
 </div>
 
 <!-- ======= HOME ======= -->
@@ -1081,7 +1251,7 @@ code{font-family:var(--mono);font-size:.85em}
         <span class="bright-text">Be deterministic about</span><br>
         <span class="gradient-text" data-text="what won't happen.">what won't happen.</span>
       </h1>
-      <p class="hero-sub">The governance layer for AI development tools. RBAC, capability gating, guardrails, and budget enforcement. Open source.</p>
+      <p class="hero-sub">Auth checks, guardrails, budget caps, and audit logs for AI agents. Ships with 17 engine modules and an 11-package plugin registry. MIT licensed.</p>
       <div class="hero-actions">
         <a class="btn-primary" href="#blog">Read the blog</a>
         <a class="btn-secondary" href="#app">Try the app &rarr;</a>
@@ -1095,11 +1265,11 @@ code{font-family:var(--mono);font-size:.85em}
           <span class="stat-label">Surfaces</span>
         </div>
         <div class="stat-item">
-          <span class="stat-num" data-count="9">0</span>
+          <span class="stat-num" data-count="11">0</span>
           <span class="stat-label">Plugins</span>
         </div>
         <div class="stat-item">
-          <span class="stat-num" data-count="188">0</span>
+          <span class="stat-num" data-count="153">0</span>
           <span class="stat-label">Tests</span>
         </div>
         <div class="stat-item">
@@ -1116,13 +1286,13 @@ code{font-family:var(--mono);font-size:.85em}
     <div class="prose">
       <p class="section-label reveal">What is OpenTool?</p>
       <div class="reveal reveal-delay-1">
-        <p>AI tools are non-deterministic. You cannot control what they will generate, suggest, or attempt. But you <em>can</em> be deterministic about what they won't execute. That distinction matters more than most people realize.</p>
+        <p>AI agents generate non-deterministic output. You cannot predict what they will suggest, write, or attempt to run. But you <em>can</em> be deterministic about what they won't execute. That distinction is the entire product.</p>
       </div>
       <div class="reveal reveal-delay-2">
-        <p>OpenTool is an open-source framework for governing AI development tools. It gives you RBAC, capability gating, guardrails, budget enforcement, and a plugin registry &mdash; so every AI agent in your org operates within boundaries you define. Not after the fact. Before.</p>
+        <p>OpenTool is an open-source control plane for AI development tools. The auth engine (<code>src/engine/auth.rs</code>, 22 unit tests) evaluates Entity &rarr; Role &rarr; Capability chains and fires guardrail rules before any tool call executes. The plugin registry ships 11 packages. The cost ledger enforces hard budget caps per entity. It runs on your machine, not ours.</p>
       </div>
       <div class="reveal reveal-delay-3">
-        <p>Think of it like OpenTelemetry for AI governance. A shared foundation that enterprise platforms build on. The plumbing that makes "AI in production" mean something other than "fingers crossed."</p>
+        <p>The API is one endpoint: <code>POST /api/auth/check</code>. Pass an entity ID, a capability, and an action string. Get back allow, deny, or warn with a reason. Integrate it in one line. The 17 engine modules (auth, cost ledger, guardrails, session replay, drift detection, provenance tracking, etc.) handle the rest.</p>
       </div>
     </div>
   </section>
@@ -1139,7 +1309,7 @@ code{font-family:var(--mono);font-size:.85em}
           </div>
           <span class="card-label"><span class="badge-shipped">shipped</span></span>
           <h3 class="card-title">OpenTool</h3>
-          <p class="card-desc">The control plane. 20 UI surfaces, 17 engine modules, cross-platform.</p>
+          <p class="card-desc">20 UI surfaces, 17 Rust engine modules, 153 tests. Ships binaries for macOS, Linux, and Windows.</p>
         </div>
         <div class="card reveal reveal-delay-2">
           <div class="card-icon">
@@ -1147,7 +1317,7 @@ code{font-family:var(--mono);font-size:.85em}
           </div>
           <span class="card-label"><span class="badge-shipped">shipped</span></span>
           <h3 class="card-title">Plugin Registry</h3>
-          <p class="card-desc">9 packages. Release channels. One-click promote from dev to staging to prod.</p>
+          <p class="card-desc">11 packages (doc-manager, otel-runtime, encryption-suite, stripe-billing, etc.). Release channels with version pinning.</p>
         </div>
         <div class="card reveal reveal-delay-3">
           <div class="card-icon">
@@ -1172,7 +1342,7 @@ code{font-family:var(--mono);font-size:.85em}
           <span>8 min read</span>
         </div>
         <h3 class="blog-card-title">How We QA'd 20 UI Surfaces in One Session</h3>
-        <p class="blog-excerpt">We started the session with 8 working sidebar routes and 5 orphaned components that led nowhere. By the end, every surface was live, tested, and the RBAC engine was blocking <code>rm -rf</code> in production.</p>
+        <p class="blog-excerpt">Case study: a self-debugging frontend session. We started with 8 working routes and 5 orphaned React components. 30 minutes later, 20 surfaces live, 31 Playwright tests green, and the auth engine blocking <code>rm -rf</code>.</p>
         <span class="read-more">Read article &rarr;</span>
       </div>
     </div>
@@ -1191,7 +1361,7 @@ code{font-family:var(--mono);font-size:.85em}
         <span>8 min read</span>
       </div>
       <h3 class="blog-card-title">How We QA'd 20 UI Surfaces in One Session</h3>
-      <p class="blog-excerpt">We started the session with 8 working sidebar routes and 5 orphaned components that led nowhere. By the end, every surface was live, tested, and the RBAC engine was blocking <code>rm -rf</code> in production.</p>
+      <p class="blog-excerpt">Case study: a self-debugging frontend session. We started with 8 working routes and 5 orphaned React components. 30 minutes later, 20 surfaces live, 31 Playwright tests green, and the auth engine blocking <code>rm -rf</code>.</p>
       <span class="tag">engineering</span>
       <span class="tag">qa</span>
       <span class="tag">rbac</span>
@@ -1387,13 +1557,13 @@ code{font-family:var(--mono);font-size:.85em}
     <div style="display:grid;grid-template-columns:1fr 320px;gap:3rem;max-width:960px;margin:2.5rem auto 0;text-align:left" class="reveal reveal-delay-3">
       <!-- LEFT: Bio (center stage) -->
       <div>
-        <p style="font-size:1rem;line-height:1.85;margin-bottom:1.25rem">I've spent the last 12 years at the intersection of infrastructure, observability, and making complex systems not fall over. I started as a Systems Engineer deploying software across Enterprise's stores and kiosks, then moved into DevOps at Columbia Sportswear where I fell in love with infrastructure-as-code.</p>
+        <p style="font-size:1rem;line-height:1.85;margin-bottom:1.25rem">My career has been a single thread with two sides: building production infrastructure and understanding what happens when it breaks. I started on the engineering side &mdash; deploying software across Enterprise Holdings' nationwide fleet of stores and kiosks, then moving to Columbia Sportswear where I led their cloud migration with Terraform, CloudFormation, and Ansible. At Oracle I designed high-availability architectures for Oracle Infinity. At Apple, I spent two years on the Siri &amp; Search infrastructure team, operating the Kubernetes clusters, Prometheus stacks, and hybrid multi-site deployments behind a service that handles billions of requests a day.</p>
 
-        <p style="font-size:1rem;line-height:1.85;margin-bottom:1.25rem">Two years at Apple on the Siri &amp; Search infrastructure team taught me what "scale" actually means &mdash; hybrid cloud, multi-site deployments, security audits on systems that serve billions of requests. After Apple, I made a deliberate pivot into customer-facing roles at New Relic and ServiceNow. I wanted to see how hundreds of companies actually run their systems, not just my own. Turns out most of them are held together with duct tape and good intentions.</p>
+        <p style="font-size:1rem;line-height:1.85;margin-bottom:1.25rem">After Apple, I made a deliberate move into customer-facing technical roles &mdash; first at New Relic, then at ServiceNow &mdash; because I wanted to see how hundreds of different engineering organizations actually run their systems, not just my own. That perspective changed how I think about tooling. When you sit across the table from a principal engineer explaining why their alerting pipeline missed a P0 at 2 a.m., you learn things that never show up in design docs.</p>
 
-        <p style="font-size:1rem;line-height:1.85;margin-bottom:1.25rem">Now I'm at Grafana Labs as a Sr. Observability Architect, designing monitoring solutions for enterprise customers. It's the best seat in the house for understanding what breaks and why.</p>
+        <p style="font-size:1rem;line-height:1.85;margin-bottom:1.25rem">Today I'm a Sr. Observability Architect at Grafana Labs, designing monitoring and SLO strategies for enterprise customers running Grafana, Prometheus, Loki, and Tempo at scale. It puts me at the center of the question I keep coming back to: how do you make complex systems observable, bounded, and trustworthy?</p>
 
-        <p style="font-size:1rem;line-height:1.85;margin-bottom:1.25rem">OpenTool is a side project born from watching AI agents do increasingly terrifying things in production environments. Deleted databases. Leaked credentials. $47K inference bills nobody noticed for 11 days. Amazon's AI agent shipped unreviewed code that caused 6.3 million lost orders. I figured someone should build the governance layer &mdash; the thing that sits between "AI can do anything" and "AI just did something catastrophic." So I'm building it. Open source, local-first, and with the same rigor I'd expect from any production infrastructure.</p>
+        <p style="font-size:1rem;line-height:1.85;margin-bottom:1.25rem">OpenTool grew out of that question. As AI coding agents became part of every developer's workflow, I watched the same failure patterns I'd spent a decade diagnosing &mdash; missing audit trails, unchecked permissions, invisible cost accumulation &mdash; repeat themselves in a new context. An agent at Amazon pushed unreviewed code that dropped order processing by 99%. A LangChain prototype ran an infinite loop for 11 days, racking up $47,000 in API charges. Replit's agent deleted a production database and fabricated fake data to hide it. These aren't hypotheticals. They're incident reports. OpenTool is the governance layer I wished existed: RBAC, cost controls, quarantine queues, and full audit trails, all instrumented with OpenTelemetry. Open source, local-first, built in Rust. The same rigor I'd expect from any production system &mdash; applied to the AI agents that are now part of it.</p>
 
         <p style="font-family:var(--mono);font-size:.8rem;color:var(--muted);margin-bottom:1.5rem">BS Computer Science &middot; Western Illinois University '14</p>
 
@@ -1475,7 +1645,7 @@ code{font-family:var(--mono);font-size:.85em}
   <div class="app-page">
     <div class="app-hero reveal">
       <h1>Connect to OpenTool</h1>
-      <p>Your local OpenTool instance powers this page. Start the engine and everything lights up.</p>
+      <p>This page connects to your local OpenTool instance on :9900. Start <code>opentool-web</code> and the UI binds to the running engine.</p>
       <div class="conn-status" id="connStatus">
         <span class="conn-dot" id="connDot"></span>
         <span id="connText">Disconnected &mdash; Start OpenTool-web on localhost:9900</span>
@@ -1488,42 +1658,136 @@ code{font-family:var(--mono);font-size:.85em}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
         <h3>RBAC &amp; Capability Gating</h3>
-        <p>Entity-to-role-to-capability mapping with inheritance and conflict resolution.</p>
+        <p>Entity &rarr; Role &rarr; Capability with inheritance and conflict resolution. Blocks <code>rm -rf</code> &mdash; tested with 22 unit tests in <code>auth.rs</code>.</p>
       </div>
       <div class="feature-cell reveal reveal-delay-2">
         <div class="feature-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
         </div>
         <h3>Plugin Registry</h3>
-        <p>9 packages across release channels. Version pinning, dependency resolution, one-click promote.</p>
+        <p>11 packages shipping today. Each declares a <code>team.json</code> manifest for auto-provisioned agent personas. Version pinning and release channels built in.</p>
       </div>
       <div class="feature-cell reveal reveal-delay-3">
         <div class="feature-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
         </div>
         <h3>Agent Cost Tracking</h3>
-        <p>Per-entity budget enforcement. Real-time spend dashboards. Hard and soft limits.</p>
+        <p>Per-entity budget enforcement via <code>cost_ledger.rs</code>. Hard and soft caps. The CostLedgerWorkbench shows real-time spend per agent session.</p>
       </div>
       <div class="feature-cell reveal reveal-delay-1">
         <div class="feature-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         </div>
         <h3>Guardrail Engine</h3>
-        <p>Pattern-matching rule chains. Deny, warn, or require-confirmation. Most restrictive wins.</p>
+        <p>Regex/glob pattern chains returning deny, warn, or require-confirmation. Most restrictive match wins. Evaluated before any tool call reaches the agent.</p>
       </div>
       <div class="feature-cell reveal reveal-delay-2">
         <div class="feature-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
         </div>
         <h3>Multi-Provider Routing</h3>
-        <p>OpenAI, Anthropic, Ollama. Priority-based fallback. Cost-aware model selection.</p>
+        <p>Backed by <code>router.rs</code> with Ollama, HTTP, and CLI provider modules. Priority-based fallback with cost-aware model selection.</p>
       </div>
       <div class="feature-cell reveal reveal-delay-3">
         <div class="feature-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
         </div>
         <h3>Audit Trail</h3>
-        <p>Every decision logged. Every tool call recorded. Exportable. Queryable. Immutable.</p>
+        <p>Every auth decision logged with entity, capability, action, and result. Session replay (<code>replay.rs</code>) and provenance tracking (<code>provenance.rs</code>) built in.</p>
+      </div>
+    </div>
+
+
+    <!-- ═══ INTERACTIVE DEMOS ═══ -->
+    <div class="demos-section reveal">
+      <h2>Try It Live</h2>
+      <p>These demos mirror real OpenTool engine behavior. No backend required.</p>
+
+      <div class="demo-grid">
+        <!-- RBAC Demo -->
+        <div class="demo-panel">
+          <div class="demo-panel-label">Live Demo</div>
+          <h3>RBAC &amp; Capability Gating</h3>
+          <div class="rbac-controls">
+            <select class="rbac-select" id="rbacEntity">
+              <option value="dev-alice">dev-alice</option>
+              <option value="ci-pipeline">ci-pipeline</option>
+              <option value="reviewer-bob">reviewer-bob</option>
+            </select>
+            <select class="rbac-select" id="rbacAction">
+              <option value="file-write">file-write</option>
+              <option value="shell: rm -rf /">shell: rm -rf /</option>
+              <option value="shell: cargo test">shell: cargo test</option>
+              <option value="shell: git push --force">shell: git push --force</option>
+              <option value="file-read">file-read</option>
+              <option value="net-outbound">net-outbound</option>
+              <option value="env-read: .env">env-read: .env</option>
+            </select>
+            <button class="rbac-btn" id="rbacEval">Evaluate</button>
+          </div>
+          <div class="rbac-result" id="rbacResult">
+            <div style="color:var(--muted);font-size:.75rem">Select an entity and action, then click Evaluate.</div>
+          </div>
+        </div>
+
+        <!-- Guardrail Demo -->
+        <div class="demo-panel">
+          <div class="demo-panel-label">Live Demo</div>
+          <h3>Guardrail Engine</h3>
+          <div class="guard-input-wrap" id="guardWrap">
+            <span class="guard-input-icon">$</span>
+            <input type="text" class="guard-input" id="guardInput" placeholder="Enter a command..." autocomplete="off" spellcheck="false">
+          </div>
+          <div class="guard-result" id="guardResult">
+            <div style="color:var(--muted);font-size:.75rem">Type a command to see real-time guardrail evaluation.</div>
+          </div>
+          <div class="guard-examples">
+            <span class="guard-example danger" data-cmd="rm -rf /">rm -rf /</span>
+            <span class="guard-example danger" data-cmd="git push --force origin main">git push --force</span>
+            <span class="guard-example danger" data-cmd="DROP TABLE users;">DROP TABLE</span>
+            <span class="guard-example danger" data-cmd="cat .env">cat .env</span>
+            <span class="guard-example danger" data-cmd="echo $AWS_SECRET_ACCESS_KEY">secrets</span>
+            <span class="guard-example safe" data-cmd="cargo test">cargo test</span>
+            <span class="guard-example safe" data-cmd="ls -la">ls -la</span>
+            <span class="guard-example safe" data-cmd="git status">git status</span>
+          </div>
+        </div>
+
+        <!-- Cost Tracker Demo -->
+        <div class="demo-panel full-width">
+          <div class="demo-panel-label">Live Demo</div>
+          <h3>Agent Cost Tracker</h3>
+          <div class="cost-display">
+            <div class="cost-header">
+              <span class="cost-amount" id="costAmount">$0.00</span>
+              <span class="cost-budget-label">Budget: <span id="costBudgetVal">$5.00</span></span>
+            </div>
+            <div class="cost-bar-track">
+              <div class="cost-bar-fill" id="costBar" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="cost-metrics">
+            <div class="cost-metric">
+              <div class="cost-metric-val" id="costTokens">0</div>
+              <div class="cost-metric-label">Tokens</div>
+            </div>
+            <div class="cost-metric">
+              <div class="cost-metric-val" id="costRequests">0</div>
+              <div class="cost-metric-label">Requests</div>
+            </div>
+            <div class="cost-metric">
+              <div class="cost-metric-val" id="costRate">$0.00/min</div>
+              <div class="cost-metric-label">Burn Rate</div>
+            </div>
+          </div>
+          <div class="cost-controls">
+            <button class="cost-btn active" id="costStart">Start Simulation</button>
+            <button class="cost-btn" id="costReset">Reset</button>
+            <button class="cost-btn" id="costBurst">Burst (10x)</button>
+          </div>
+          <div class="cost-alert" id="costAlert"></div>
+          <div class="cost-log" id="costLog"></div>
+        </div>
       </div>
     </div>
 
