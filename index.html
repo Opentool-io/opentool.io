@@ -787,6 +787,31 @@ code{font-family:var(--mono);font-size:.85em}
   -webkit-text-fill-color:transparent;
 }
 
+/* ── TIMELINE ── */
+.timeline{max-width:600px;margin:0 auto 2.5rem;position:relative;padding-left:3rem}
+.timeline::before{content:'';position:absolute;left:14px;top:8px;bottom:8px;width:2px;background:linear-gradient(to bottom,var(--mint),var(--lavender),var(--mint));opacity:.25;border-radius:2px}
+.tl-item{position:relative;margin-bottom:1.5rem;padding-left:.5rem}
+.tl-dot{position:absolute;left:-2.85rem;top:.45rem;width:10px;height:10px;border-radius:50%;border:2px solid var(--mint);background:var(--bg);z-index:1;transition:all .3s}
+.tl-item:hover .tl-dot{background:var(--mint);box-shadow:0 0 12px rgba(141,241,189,0.5)}
+.tl-header{display:flex;align-items:center;gap:.6rem;margin-bottom:.2rem}
+.tl-logo{font-size:1.3rem;filter:grayscale(0);transition:filter .3s}
+.tl-item:hover .tl-logo{filter:grayscale(0) drop-shadow(0 0 6px rgba(141,241,189,0.3))}
+.tl-role{font-size:.9rem;font-weight:600;color:var(--text)}
+.tl-company{font-size:.8rem;color:var(--mint);font-weight:600}
+.tl-dates{font-family:var(--mono);font-size:.65rem;color:var(--muted);margin-top:.1rem}
+.tl-desc{font-size:.8rem;color:var(--muted);margin-top:.25rem;line-height:1.5}
+.tl-current .tl-dot{background:var(--mint);box-shadow:0 0 10px rgba(141,241,189,0.4)}
+
+.about-resume-link{
+  display:inline-block;margin-top:1rem;
+  font-family:var(--mono);font-size:.75rem;
+  padding:.5rem 1.2rem;
+  border:1px solid rgba(141,241,189,0.2);border-radius:6px;
+  color:var(--mint);
+  transition:all .2s;
+}
+.about-resume-link:hover{background:rgba(141,241,189,0.08);border-color:rgba(141,241,189,0.4)}
+
 /* ══════════════════════════════════════════════
    APP PAGE
    ══════════════════════════════════════════════ */
@@ -1358,10 +1383,70 @@ code{font-family:var(--mono);font-size:.85em}
     <h1 class="about-name reveal reveal-delay-1">Sean Coady</h1>
     <p class="about-title reveal reveal-delay-2">Sr. Observability Architect &middot; Portland, OR</p>
     <div class="about-bio reveal reveal-delay-3">
-      <p>I've spent the last 12 years at the intersection of infrastructure, observability, and making complex systems not fall over. Started as a Systems Engineer at Enterprise, moved through DevOps at Columbia Sportswear, SRE at Oracle, then spent two years at Apple keeping Siri's infrastructure alive. Somewhere along the way I realized I liked the problem-solving side more than the ticket-closing side.</p>
-      <p>That led to a pivot into customer-facing engineering &mdash; TAM roles at New Relic and ServiceNow, where I got to see how hundreds of companies actually run (and break) their systems. Now I'm at Grafana Labs as a Sr. Observability Architect, helping teams design monitoring that actually tells them something useful.</p>
-      <p>OpenTool is a side project born from watching AI agents do increasingly terrifying things in production environments. Deleted databases. Leaked credentials. $47K inference bills nobody noticed for 11 days. I figured someone should build the governance layer &mdash; the thing that sits between "AI can do anything" and "AI just did something catastrophic." So I'm building it. Open source, local-first, and with the same rigor I'd expect from any production infrastructure.</p>
-      <p style="font-family:var(--mono);font-size:.8rem;color:var(--muted)">BS Computer Science &middot; Western Illinois University '14<br>Apple &middot; Oracle &middot; Columbia Sportswear &middot; New Relic &middot; ServiceNow &middot; Grafana Labs</p>
+      <p>12 years building, breaking, and fixing systems at scale. Started on the engineering side, moved into customer-facing roles where I got to see how hundreds of companies actually operate, then came back to building &mdash; this time with a much better idea of what matters.</p>
+      <p>OpenTool is a side project born from watching AI agents do terrifying things in production. Deleted databases. Leaked credentials. $47K inference bills nobody noticed. I figured someone should build the governance layer. So I'm building it.</p>
+    </div>
+
+    <div class="timeline reveal reveal-delay-4">
+      <div class="tl-item tl-current">
+        <div class="tl-dot"></div>
+        <div class="tl-header"><span class="tl-logo">🟠</span> <span class="tl-company">Grafana Labs</span></div>
+        <div class="tl-role">Sr. Observability Architect</div>
+        <div class="tl-dates">Nov 2024 &mdash; Present &middot; Portland, OR</div>
+        <div class="tl-desc">Designing observability solutions for enterprise customers. QBRs, technical training, product roadmap influence.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-header"><span class="tl-logo">🟢</span> <span class="tl-company">ServiceNow</span></div>
+        <div class="tl-role">Sr. Technical Account Manager</div>
+        <div class="tl-dates">Oct 2022 &mdash; Oct 2024</div>
+        <div class="tl-desc">Strategic account management for marquee customers. Custom dashboards, adoption strategies, product influence.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-header"><span class="tl-logo">💚</span> <span class="tl-company">New Relic</span></div>
+        <div class="tl-role">Technical Account Manager</div>
+        <div class="tl-dates">Feb 2022 &mdash; Oct 2022</div>
+        <div class="tl-desc">Automated usage reporting, industry events, product enablement.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-header"><span class="tl-logo"></span> <span class="tl-company">Apple</span></div>
+        <div class="tl-role">Sr. Systems Development Engineer</div>
+        <div class="tl-dates">Dec 2019 &mdash; Feb 2022</div>
+        <div class="tl-desc">Siri &amp; Search infrastructure. Hybrid cloud deployments. Terraform, Helm, Packer, Ansible. Security audits.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-header"><span class="tl-logo">🔴</span> <span class="tl-company">Oracle</span></div>
+        <div class="tl-role">Site Reliability Engineer</div>
+        <div class="tl-dates">Jan 2018 &mdash; Nov 2019</div>
+        <div class="tl-desc">High-availability architecture for Oracle Infinity. Jenkins, Spinnaker, infrastructure automation.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-header"><span class="tl-logo">🏔️</span> <span class="tl-company">Columbia Sportswear</span></div>
+        <div class="tl-role">DevOps Engineer</div>
+        <div class="tl-dates">Sep 2016 &mdash; Jan 2018</div>
+        <div class="tl-desc">Cloud migration for e-commerce brands. Terraform, CloudFormation. Spot instance cost optimization.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-header"><span class="tl-logo">🚗</span> <span class="tl-company">Enterprise Holdings</span></div>
+        <div class="tl-role">Systems Engineer</div>
+        <div class="tl-dates">May 2014 &mdash; Sep 2016 &middot; St. Louis, MO</div>
+        <div class="tl-desc">Production deployments across stores, kiosks, and online platforms. Where it all started.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-header"><span class="tl-logo">🎓</span> <span class="tl-company">Western Illinois University</span></div>
+        <div class="tl-role">BS Computer Science</div>
+        <div class="tl-dates">2009 &mdash; 2014</div>
+      </div>
+    </div>
+
+    <div style="text-align:center" class="reveal reveal-delay-5">
+      <a class="about-resume-link" href="/SeanCoady_OpenTool_2026.html" target="_blank">View full resume &rarr;</a>
     </div>
     <div class="about-links reveal reveal-delay-4">
       <a href="https://github.com/Opentool-io" target="_blank" rel="noopener" aria-label="GitHub">

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sean Coady — Resume</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Instrument Sans',system-ui,sans-serif;color:#1a1a2e;background:#fff;line-height:1.6;max-width:800px;margin:0 auto;padding:2rem}
+@media print{body{padding:.5in;font-size:10pt}h1{font-size:20pt}h2{font-size:11pt}h3{font-size:10pt}.no-print{display:none}}
+
+h1{font-size:2rem;font-weight:700;letter-spacing:-.02em}
+.subtitle{font-size:.9rem;color:#4a5568;margin-top:.2rem}
+.contact{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:#6b7280;margin-top:.5rem;display:flex;gap:1.5rem;flex-wrap:wrap}
+.contact a{color:#6b7280;text-decoration:none}
+.contact a:hover{color:#1a1a2e}
+
+.divider{border:none;border-top:2px solid #06080c;margin:1.25rem 0 1rem}
+.divider-thin{border:none;border-top:1px solid #e5e7eb;margin:.75rem 0}
+
+h2{font-size:.7rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#8df1bd;background:#06080c;display:inline-block;padding:.2rem .6rem;border-radius:3px;margin-bottom:.75rem}
+
+.job{margin-bottom:1.25rem}
+.job-header{display:flex;justify-content:space-between;align-items:baseline}
+h3{font-size:.95rem;font-weight:700}
+.company{color:#4a5568;font-weight:600}
+.dates{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:#9ca3af}
+.location{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#9ca3af}
+ul{margin:.4rem 0 0 1.2rem;font-size:.85rem;color:#374151}
+li{margin-bottom:.2rem}
+
+.skills-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;font-size:.8rem}
+.skill-cat{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#8df1bd;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.25rem}
+.skill-list{color:#4a5568;font-size:.8rem;line-height:1.5}
+
+.project{background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:1rem;margin-bottom:.75rem}
+.project-name{font-weight:700;font-size:.9rem}
+.project-desc{font-size:.8rem;color:#4a5568;margin-top:.2rem}
+.project-tech{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#8df1bd;margin-top:.4rem}
+.project-logo{display:inline-block;background:linear-gradient(135deg,#8df1bd,#c39aff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700;font-size:.75rem;margin-right:.4rem}
+
+.edu{font-size:.85rem}
+.edu-school{font-weight:600}
+.edu-degree{color:#4a5568}
+</style>
+</head>
+<body>
+
+<h1>Sean Coady</h1>
+<p class="subtitle">Sr. Observability Architect — Infrastructure, Tooling, AI Governance</p>
+<div class="contact">
+  <span>Portland, OR</span>
+  <a href="mailto:sean.coady@opentool.io">sean.coady@opentool.io</a>
+  <a href="https://opentool.io">opentool.io</a>
+  <a href="https://www.linkedin.com/in/sean-c-8a0794113/">LinkedIn</a>
+  <a href="https://github.com/Opentool-io">GitHub</a>
+</div>
+
+<hr class="divider">
+
+<h2>Experience</h2>
+
+<div class="job">
+  <div class="job-header">
+    <div><h3>Sr. Observability Architect</h3> <span class="company">Grafana Labs</span></div>
+    <div class="dates">Nov 2024 — Present</div>
+  </div>
+  <span class="location">Portland, OR</span>
+  <ul>
+    <li>Architect observability solutions for enterprise customers, driving adoption of Grafana stack across complex infrastructure</li>
+    <li>Host quarterly business reviews with stakeholder engagement, improving customer retention</li>
+    <li>Serve as feedback channel between customers and product teams, directly impacting roadmap prioritization</li>
+    <li>Deliver personalized technical training on observability patterns, monitoring design, and SLO management</li>
+  </ul>
+</div>
+
+<div class="job">
+  <div class="job-header">
+    <div><h3>Sr. Technical Account Manager</h3> <span class="company">ServiceNow</span></div>
+    <div class="dates">Oct 2022 — Oct 2024</div>
+  </div>
+  <span class="location">Portland, OR</span>
+  <ul>
+    <li>Strategically influenced product development teams to deliver features for marquee enterprise accounts</li>
+    <li>Developed custom dashboards, alerts, and onboarding tooling to accelerate customer time-to-value</li>
+    <li>Identified account growth opportunities and formulated adoption strategies with account executives</li>
+  </ul>
+</div>
+
+<div class="job">
+  <div class="job-header">
+    <div><h3>Technical Account Manager</h3> <span class="company">New Relic</span></div>
+    <div class="dates">Feb 2022 — Oct 2022</div>
+  </div>
+  <span class="location">Portland, OR</span>
+  <ul>
+    <li>Automated customer usage reporting using New Relic platform APIs</li>
+    <li>Represented New Relic at industry events and delivered product enablement sessions</li>
+  </ul>
+</div>
+
+<div class="job">
+  <div class="job-header">
+    <div><h3>Sr. Systems Development Engineer</h3> <span class="company">Apple</span></div>
+    <div class="dates">Dec 2019 — Feb 2022</div>
+  </div>
+  <span class="location">Portland, OR</span>
+  <ul>
+    <li>Proactive support for critical Siri and Search infrastructure (Grafana, Prometheus, Splunk)</li>
+    <li>Led migration to containerized cloud infrastructure across hybrid multi-site deployments</li>
+    <li>Developed IaC tooling (Terraform, Helm, Packer, Ansible) reducing manual configuration across teams</li>
+    <li>Implemented access controls and continuous security audits</li>
+  </ul>
+</div>
+
+<div class="job">
+  <div class="job-header">
+    <div><h3>Site Reliability Engineer</h3> <span class="company">Oracle</span></div>
+    <div class="dates">Jan 2018 — Nov 2019</div>
+  </div>
+  <span class="location">Portland, OR</span>
+  <ul>
+    <li>Designed high-availability deployment architecture for Oracle Infinity with SLA compliance</li>
+    <li>Modernized build/deploy infrastructure with Jenkins, Artifactory, and Spinnaker</li>
+  </ul>
+</div>
+
+<div class="job">
+  <div class="job-header">
+    <div><h3>DevOps Engineer</h3> <span class="company">Columbia Sportswear</span></div>
+    <div class="dates">Sep 2016 — Jan 2018</div>
+  </div>
+  <span class="location">Hillsboro, OR</span>
+  <ul>
+    <li>Transitioned e-commerce infrastructure to public cloud using Terraform, CloudFormation, Packer, Ansible</li>
+    <li>Implemented ephemeral build agents on AWS Spot Instances, reducing compute costs</li>
+  </ul>
+</div>
+
+<div class="job">
+  <div class="job-header">
+    <div><h3>Systems Engineer</h3> <span class="company">Enterprise Holdings</span></div>
+    <div class="dates">May 2014 — Sep 2016</div>
+  </div>
+  <span class="location">St. Louis, MO</span>
+  <ul>
+    <li>Production deployments across stores, kiosks, and online platforms; led developer training on tooling and processes</li>
+  </ul>
+</div>
+
+<hr class="divider-thin">
+
+<h2>Projects</h2>
+
+<div class="project">
+  <div class="project-name"><span class="project-logo">&#9670;</span> OpenTool <span style="font-weight:400;font-size:.75rem;color:#9ca3af">— opentool.io</span></div>
+  <div class="project-desc">Open-source AI governance framework. RBAC engine with capability gating, budget enforcement, and guardrail evaluation. 20 UI surfaces, 10 plugins, 188 tests, cross-platform (Linux/macOS/Windows). Built with Rust + React + TypeScript.</div>
+  <div class="project-tech">Rust &middot; Axum &middot; React 19 &middot; TypeScript &middot; Playwright &middot; OpenTelemetry &middot; Terraform &middot; AWS</div>
+</div>
+
+<hr class="divider-thin">
+
+<h2>Skills</h2>
+
+<div class="skills-grid">
+  <div>
+    <div class="skill-cat">Infrastructure</div>
+    <div class="skill-list">Linux, Kubernetes, Terraform, Helm, Ansible, Packer, Docker, AWS, GCP</div>
+  </div>
+  <div>
+    <div class="skill-cat">Observability</div>
+    <div class="skill-list">Grafana, Prometheus, OpenTelemetry, Splunk, SLO Design, Incident Management</div>
+  </div>
+  <div>
+    <div class="skill-cat">Development</div>
+    <div class="skill-list">Rust, Python, TypeScript, React, JavaScript, REST APIs, CI/CD, Git</div>
+  </div>
+</div>
+
+<hr class="divider-thin">
+
+<h2>Education</h2>
+
+<div class="edu">
+  <span class="edu-school">Western Illinois University</span> — <span class="edu-degree">BS Computer Science, 2014</span>
+</div>
+
+</body>
+</html>
