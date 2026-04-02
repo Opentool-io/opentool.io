@@ -428,9 +428,9 @@ align-items:center;justify-content:center;gap:1rem;
 <nav class="nav" id="nav">
   <span class="nav-wordmark" onclick="navigate('/')">OpenTool</span>
   <div class="nav-links">
-    <a href="#blog" onclick="navigate('blog')">Blog</a>
-    <a href="#about" onclick="navigate('about')">About</a>
-    <a href="#app" onclick="navigate('app')">App</a>
+    <a href="#blog">Blog</a>
+    <a href="#about">About</a>
+    <a href="#app">App</a>
   </div>
   <button class="hamburger" id="hamburger" aria-label="Menu">
     <span></span><span></span><span></span>
@@ -438,9 +438,9 @@ align-items:center;justify-content:center;gap:1rem;
 </nav>
 
 <div class="mobile-menu" id="mobileMenu">
-  <a href="#blog" onclick="navigate('blog');closeMobile()">Blog</a>
-  <a href="#about" onclick="navigate('about');closeMobile()">About</a>
-  <a href="#app" onclick="navigate('app');closeMobile()">App</a>
+  <a href="#blog" onclick="closeMobile()">Blog</a>
+  <a href="#about" onclick="closeMobile()">About</a>
+  <a href="#app" onclick="closeMobile()">App</a>
 </div>
 
 <!-- ═══════ HOME ═══════ -->
@@ -450,8 +450,8 @@ align-items:center;justify-content:center;gap:1rem;
     <h1 class="hero-headline">Be deterministic about what won't happen.</h1>
     <p class="hero-sub">The governance layer for AI development tools. Open source.</p>
     <div class="hero-actions">
-      <a class="pill" href="#blog" onclick="navigate('blog')">Read the blog &rarr;</a>
-      <a class="pill" href="#app" onclick="navigate('app')">Try the app &rarr;</a>
+      <a class="pill" href="#blog">Read the blog &rarr;</a>
+      <a class="pill" href="#app">Try the app &rarr;</a>
     </div>
     <div class="hero-stats">
       <div class="rule"></div>
@@ -503,7 +503,7 @@ align-items:center;justify-content:center;gap:1rem;
   <section class="section">
     <div class="section-inner">
       <p class="section-label fade-in">Latest from the blog</p>
-      <div class="latest-blog fade-in" onclick="navigate('blog-post-qa')">
+      <div class="latest-blog fade-in" onclick="location.hash='blog-post-qa'">
         <div class="blog-meta">
           <span>April 2026</span>
           <span>8 min read</span>
@@ -521,7 +521,7 @@ align-items:center;justify-content:center;gap:1rem;
   <div class="blog-list">
     <p class="section-label">Blog</p>
 
-    <div class="blog-card" onclick="navigate('blog-post-qa')">
+    <div class="blog-card" onclick="location.hash='blog-post-qa'">
       <div class="blog-meta">
         <span>April 2026</span>
         <span>8 min read</span>
@@ -539,7 +539,7 @@ align-items:center;justify-content:center;gap:1rem;
 <!-- ═══════ BLOG POST ═══════ -->
 <div class="page" id="page-blog-post-qa">
   <div class="blog-post">
-    <a class="blog-post-back" href="#blog" onclick="navigate('blog')">&larr; Back to blog</a>
+    <a class="blog-post-back" href="#blog">&larr; Back to blog</a>
     <h1 class="blog-post-title">How We QA'd 20 UI Surfaces in One Session</h1>
     <div class="blog-post-meta">
       <span>April 2026</span>
@@ -761,29 +761,37 @@ $ npx playwright test --reporter=list
     'app':'page-app'
   };
 
+  let navigating = false;
   function navigate(route, pushState){
+    if(navigating) return;
+    navigating = true;
     if(route.startsWith('#')) route = route.slice(1);
     if(route === '' || route === '/') route = '/';
     const pageId = pages[route] || pages['/'];
+    const target = document.getElementById(pageId);
 
+    // Hide all pages immediately
     document.querySelectorAll('.page').forEach(p=>{
-      p.classList.remove('visible');
-      setTimeout(()=>{ p.classList.remove('active'); }, 350);
+      if(p.id !== pageId){
+        p.classList.remove('visible');
+        p.classList.remove('active');
+      }
     });
 
-    setTimeout(()=>{
-      document.querySelectorAll('.page').forEach(p=> p.classList.remove('active'));
-      const target = document.getElementById(pageId);
-      if(target){
-        target.classList.add('active');
-        requestAnimationFrame(()=>{
-          requestAnimationFrame(()=> target.classList.add('visible'));
-        });
-      }
-      window.scrollTo({top:0,behavior:'instant'});
-      updateNav(route);
-      observeFadeIns();
-    }, 200);
+    // Show target
+    if(target){
+      target.classList.add('active');
+      requestAnimationFrame(()=>{
+        target.classList.add('visible');
+        navigating = false;
+      });
+    } else {
+      navigating = false;
+    }
+
+    window.scrollTo({top:0,behavior:'instant'});
+    updateNav(route);
+    observeFadeIns();
 
     if(pushState !== false){
       history.pushState(null, '', '#' + (route === '/' ? '' : route));
