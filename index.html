@@ -2267,6 +2267,365 @@ code{font-family:var(--mono);font-size:.85em}
   checkConnection();
   setInterval(checkConnection, 8000);
 
+  /* ════════════════════════════════════════════
+     INTERACTIVE DEMO: RBAC
+     ════════════════════════════════════════════ */
+  (function initRbacDemo(){
+    var entitySelect = document.getElementById('rbacEntity');
+    var actionSelect = document.getElementById('rbacAction');
+    var evalBtn = document.getElementById('rbacEval');
+    var resultDiv = document.getElementById('rbacResult');
+    if(!evalBtn) return;
+
+    // Mock RBAC data matching the real auth engine
+    var entities = {
+      'dev-alice': {
+        roles: ['developer'],
+        capabilities: ['file-read','file-write','shell:safe','net-outbound']
+      },
+      'ci-pipeline': {
+        roles: ['ci-runner'],
+        capabilities: ['file-read','file-write','shell:safe','shell:build']
+      },
+      'reviewer-bob': {
+        roles: ['reviewer'],
+        capabilities: ['file-read']
+      }
+    };
+
+    // Guardrail-level denials (these override capabilities)
+    var hardDeny = [
+      {pattern: /rm\s+(-rf|-r\s+-f|-f\s+-r)\s+\//, rule: 'guardrail:destructive-fs', reason: 'Destructive filesystem operation blocked by guardrail'},
+      {pattern: /push\s+--force/, rule: 'guardrail:force-push', reason: 'Force push blocked by guardrail chain'},
+      {pattern: /\.env/, rule: 'guardrail:env-access', reason: 'Direct .env access blocked — use secrets manager'}
+    ];
+
+    function evaluate(){
+      var entity = entitySelect.value;
+      var action = actionSelect.value;
+      var e = entities[entity];
+      var roleTags = e.roles.map(function(r){return '<span class="rbac-role-tag">' + r + '</span>'}).join('');
+      var capTags = e.capabilities.map(function(c){return '<span class="rbac-cap">' + c + '</span>'}).join('');
+
+      // Check hard denials first
+      for(var i = 0; i < hardDeny.length; i++){
+        if(hardDeny[i].pattern.test(action)){
+          resultDiv.className = 'rbac-result deny';
+          resultDiv.innerHTML =
+            '<div class="rbac-verdict deny">DENY</div>' +
+            '<div class="rbac-reason">' +
+            '<strong>Entity:</strong> ' + entity + ' ' + roleTags + '<br>' +
+            '<strong>Action:</strong> ' + action + '<br>' +
+            '<strong>Rule:</strong> ' + hardDeny[i].rule + '<br>' +
+            '<strong>Reason:</strong> ' + hardDeny[i].reason +
+            '</div>';
+          return;
+        }
+      }
+
+      // Capability check
+      var actionType = action.split(':')[0].trim();
+      if(action.startsWith('shell:')){
+        var cmd = action.split(':').slice(1).join(':').trim();
+        var safeShell = /^(cargo|npm|yarn|pnpm|go|make|python|pip|rustc|gcc|ls|cat|echo|pwd|whoami|uname|date|wc|head|tail|sort|grep|find|git\s+(status|log|diff|branch|show|stash))/.test(cmd);
+        var buildShell = /^(cargo|npm|yarn|pnpm|go|make|docker)\s+(build|test|run|install|ci|pack|lint|check|clippy|fmt)/.test(cmd);
+
+        if(safeShell && e.capabilities.indexOf('shell:safe') !== -1){
+          resultDiv.className = 'rbac-result allow';
+          resultDiv.innerHTML =
+            '<div class="rbac-verdict allow">ALLOW</div>' +
+            '<div class="rbac-reason">' +
+            '<strong>Entity:</strong> ' + entity + ' ' + roleTags + '<br>' +
+            '<strong>Action:</strong> ' + action + '<br>' +
+            '<strong>Matched:</strong> shell:safe capability<br>' +
+            '<strong>Caps:</strong>' +
+            '<div class="rbac-cap-list">' + capTags + '</div>' +
+            '</div>';
+        } else if(buildShell && e.capabilities.indexOf('shell:build') !== -1){
+          resultDiv.className = 'rbac-result allow';
+          resultDiv.innerHTML =
+            '<div class="rbac-verdict allow">ALLOW</div>' +
+            '<div class="rbac-reason">' +
+            '<strong>Entity:</strong> ' + entity + ' ' + roleTags + '<br>' +
+            '<strong>Action:</strong> ' + action + '<br>' +
+            '<strong>Matched:</strong> shell:build capability<br>' +
+            '<strong>Caps:</strong>' +
+            '<div class="rbac-cap-list">' + capTags + '</div>' +
+            '</div>';
+        } else {
+          resultDiv.className = 'rbac-result deny';
+          resultDiv.innerHTML =
+            '<div class="rbac-verdict deny">DENY</div>' +
+            '<div class="rbac-reason">' +
+            '<strong>Entity:</strong> ' + entity + ' ' + roleTags + '<br>' +
+            '<strong>Action:</strong> ' + action + '<br>' +
+            '<strong>Reason:</strong> No matching shell capability. Required: shell:admin or explicit grant.<br>' +
+            '<strong>Caps:</strong>' +
+            '<div class="rbac-cap-list">' + capTags + '</div>' +
+            '</div>';
+        }
+      } else if(e.capabilities.indexOf(actionType) !== -1){
+        resultDiv.className = 'rbac-result allow';
+        resultDiv.innerHTML =
+          '<div class="rbac-verdict allow">ALLOW</div>' +
+          '<div class="rbac-reason">' +
+          '<strong>Entity:</strong> ' + entity + ' ' + roleTags + '<br>' +
+          '<strong>Action:</strong> ' + action + '<br>' +
+          '<strong>Matched:</strong> ' + actionType + ' capability<br>' +
+          '<strong>Caps:</strong>' +
+          '<div class="rbac-cap-list">' + capTags + '</div>' +
+          '</div>';
+      } else {
+        resultDiv.className = 'rbac-result deny';
+        resultDiv.innerHTML =
+          '<div class="rbac-verdict deny">DENY</div>' +
+          '<div class="rbac-reason">' +
+          '<strong>Entity:</strong> ' + entity + ' ' + roleTags + '<br>' +
+          '<strong>Action:</strong> ' + action + '<br>' +
+          '<strong>Reason:</strong> Capability "' + actionType + '" not granted to role "' + e.roles.join(', ') + '". Most restrictive policy wins.<br>' +
+          '<strong>Caps:</strong>' +
+          '<div class="rbac-cap-list">' + capTags + '</div>' +
+          '</div>';
+      }
+    }
+
+    evalBtn.addEventListener('click', evaluate);
+    entitySelect.addEventListener('change', evaluate);
+    actionSelect.addEventListener('change', evaluate);
+  })();
+
+  /* ════════════════════════════════════════════
+     INTERACTIVE DEMO: GUARDRAILS
+     ════════════════════════════════════════════ */
+  (function initGuardrailDemo(){
+    var input = document.getElementById('guardInput');
+    var wrap = document.getElementById('guardWrap');
+    var result = document.getElementById('guardResult');
+    if(!input) return;
+
+    var rules = [
+      {pattern: /rm\s+(-[a-z]*r[a-z]*\s+-[a-z]*f[a-z]*|-[a-z]*f[a-z]*\s+-[a-z]*r[a-z]*|-rf|-fr)\s*/i, name: 'destructive-rm', desc: 'Recursive force-delete detected. Blocked by guardrail:destructive-fs.', severity: 'DENY'},
+      {pattern: /rm\s+(-r|--recursive)\s/i, name: 'recursive-delete', desc: 'Recursive delete without force. Blocked by guardrail:destructive-fs.', severity: 'DENY'},
+      {pattern: /git\s+push\s+--force/i, name: 'force-push', desc: 'Force push rewrites history. Blocked by guardrail:git-safety.', severity: 'DENY'},
+      {pattern: /git\s+push\s+-f\b/i, name: 'force-push-short', desc: 'Force push (short flag) detected. Blocked by guardrail:git-safety.', severity: 'DENY'},
+      {pattern: /DROP\s+(TABLE|DATABASE|INDEX|VIEW)/i, name: 'sql-drop', desc: 'Destructive SQL statement. Blocked by guardrail:sql-safety.', severity: 'DENY'},
+      {pattern: /DELETE\s+FROM\s+\w+\s*(;|$)/i, name: 'sql-delete-all', desc: 'DELETE without WHERE clause. Blocked by guardrail:sql-safety.', severity: 'DENY'},
+      {pattern: /TRUNCATE\s+TABLE/i, name: 'sql-truncate', desc: 'TRUNCATE TABLE detected. Blocked by guardrail:sql-safety.', severity: 'DENY'},
+      {pattern: /\.env\b/i, name: 'env-file', desc: 'Access to .env file detected. Blocked by guardrail:secret-access.', severity: 'DENY'},
+      {pattern: /(SECRET|PRIVATE_KEY|PASSWORD|TOKEN|API_KEY|AWS_SECRET)/i, name: 'secret-leak', desc: 'Potential secret/credential exposure. Blocked by guardrail:secret-access.', severity: 'DENY'},
+      {pattern: /chmod\s+777/i, name: 'unsafe-perms', desc: 'World-writable permissions. Blocked by guardrail:fs-permissions.', severity: 'DENY'},
+      {pattern: /curl.*\|\s*(sh|bash)/i, name: 'pipe-to-shell', desc: 'Pipe-to-shell detected. Blocked by guardrail:remote-exec.', severity: 'DENY'},
+      {pattern: /:(){ :\|:& };:/i, name: 'fork-bomb', desc: 'Fork bomb detected. Blocked by guardrail:destructive-process.', severity: 'DENY'},
+      {pattern: /mkfs\./i, name: 'format-disk', desc: 'Disk format command detected. Blocked by guardrail:destructive-fs.', severity: 'DENY'},
+      {pattern: /dd\s+if=.*of=\/dev\//i, name: 'raw-disk-write', desc: 'Raw disk write detected. Blocked by guardrail:destructive-fs.', severity: 'DENY'}
+    ];
+
+    function evaluate(cmd){
+      cmd = cmd.trim();
+      if(!cmd){
+        wrap.className = 'guard-input-wrap';
+        result.className = 'guard-result';
+        result.innerHTML = '<div style="color:var(--muted);font-size:.75rem">Type a command to see real-time guardrail evaluation.</div>';
+        return;
+      }
+
+      for(var i = 0; i < rules.length; i++){
+        if(rules[i].pattern.test(cmd)){
+          wrap.className = 'guard-input-wrap blocked';
+          result.className = 'guard-result blocked';
+          result.innerHTML =
+            '<div class="guard-status blocked">BLOCKED</div>' +
+            '<div class="guard-rule">' +
+            '<strong>Rule:</strong> guardrail:' + rules[i].name + '<br>' +
+            rules[i].desc +
+            '</div>';
+          return;
+        }
+      }
+
+      wrap.className = 'guard-input-wrap allowed';
+      result.className = 'guard-result allowed';
+      result.innerHTML =
+        '<div class="guard-status allowed">ALLOWED</div>' +
+        '<div class="guard-rule">' +
+        'No guardrail rules matched. Command passes all ' + rules.length + ' rule chains.' +
+        '</div>';
+    }
+
+    input.addEventListener('input', function(){evaluate(this.value)});
+
+    // Example chips
+    document.querySelectorAll('.guard-example').forEach(function(el){
+      el.addEventListener('click', function(){
+        input.value = this.getAttribute('data-cmd');
+        input.focus();
+        evaluate(input.value);
+      });
+    });
+  })();
+
+  /* ════════════════════════════════════════════
+     INTERACTIVE DEMO: COST TRACKER
+     ════════════════════════════════════════════ */
+  (function initCostDemo(){
+    var amountEl = document.getElementById('costAmount');
+    var barEl = document.getElementById('costBar');
+    var tokensEl = document.getElementById('costTokens');
+    var requestsEl = document.getElementById('costRequests');
+    var rateEl = document.getElementById('costRate');
+    var alertEl = document.getElementById('costAlert');
+    var logEl = document.getElementById('costLog');
+    var startBtn = document.getElementById('costStart');
+    var resetBtn = document.getElementById('costReset');
+    var burstBtn = document.getElementById('costBurst');
+    if(!startBtn) return;
+
+    var budget = 5.00;
+    var spent = 0;
+    var tokens = 0;
+    var requests = 0;
+    var running = false;
+    var interval = null;
+    var burstMode = false;
+    var startTime = null;
+    var warnFired = false;
+    var denyFired = false;
+
+    var models = [
+      {name:'claude-3.5-sonnet', costPer1k: 0.003, avgTokens: 800},
+      {name:'claude-3-haiku', costPer1k: 0.00025, avgTokens: 400},
+      {name:'gpt-4o', costPer1k: 0.005, avgTokens: 1200},
+      {name:'ollama/llama3', costPer1k: 0, avgTokens: 600}
+    ];
+
+    function fmt(n){return '$' + n.toFixed(2)}
+    function fmtTokens(n){
+      if(n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+      if(n >= 1000) return (n/1000).toFixed(1) + 'k';
+      return n.toString();
+    }
+
+    function addLog(msg){
+      var line = document.createElement('div');
+      var ts = new Date();
+      var hh = String(ts.getHours()).padStart(2,'0');
+      var mm = String(ts.getMinutes()).padStart(2,'0');
+      var ss = String(ts.getSeconds()).padStart(2,'0');
+      line.textContent = '[' + hh + ':' + mm + ':' + ss + '] ' + msg;
+      logEl.appendChild(line);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function render(){
+      var pct = Math.min((spent / budget) * 100, 100);
+      amountEl.textContent = fmt(spent);
+      barEl.style.width = pct + '%';
+      tokensEl.textContent = fmtTokens(tokens);
+      requestsEl.textContent = requests;
+
+      // Burn rate
+      if(startTime){
+        var elapsed = (Date.now() - startTime) / 60000; // minutes
+        if(elapsed > 0){
+          rateEl.textContent = fmt(spent / elapsed) + '/min';
+        }
+      }
+
+      // Color states
+      amountEl.className = 'cost-amount';
+      barEl.className = 'cost-bar-fill';
+      if(pct >= 100){
+        amountEl.classList.add('deny');
+        barEl.classList.add('deny');
+      } else if(pct >= 90){
+        amountEl.classList.add('warn');
+        barEl.classList.add('warn');
+      }
+
+      // Alerts
+      if(pct >= 100 && !denyFired){
+        denyFired = true;
+        alertEl.className = 'cost-alert deny visible';
+        alertEl.textContent = 'BUDGET EXHAUSTED — All requests DENIED. Entity budget hard-limit reached.';
+        addLog('DENY: budget exceeded (' + fmt(spent) + ' / ' + fmt(budget) + '). Killing simulation.');
+        stop();
+      } else if(pct >= 90 && !warnFired){
+        warnFired = true;
+        alertEl.className = 'cost-alert warn visible';
+        alertEl.textContent = 'WARNING — 90% budget consumed. Soft limit threshold reached.';
+        addLog('WARN: 90% budget threshold (' + fmt(spent) + ' / ' + fmt(budget) + ')');
+      }
+    }
+
+    function tick(){
+      if(spent >= budget) return;
+      var multiplier = burstMode ? 10 : 1;
+      var model = models[Math.floor(Math.random() * models.length)];
+      var tokCount = Math.round((model.avgTokens + (Math.random() - 0.5) * model.avgTokens * 0.4) * multiplier);
+      var cost = (tokCount / 1000) * model.costPer1k;
+
+      tokens += tokCount;
+      spent += cost;
+      requests += 1;
+
+      if(cost > 0){
+        addLog(model.name + ' — ' + fmtTokens(tokCount) + ' tokens — ' + fmt(cost));
+      } else {
+        addLog(model.name + ' — ' + fmtTokens(tokCount) + ' tokens — $0.00 (local)');
+      }
+
+      render();
+    }
+
+    function start(){
+      if(running) return;
+      if(spent >= budget){reset();}
+      running = true;
+      startTime = startTime || Date.now();
+      startBtn.textContent = 'Running...';
+      startBtn.classList.add('active');
+      addLog('Simulation started — budget ' + fmt(budget));
+      interval = setInterval(tick, 400);
+    }
+
+    function stop(){
+      running = false;
+      burstMode = false;
+      if(interval){clearInterval(interval);interval = null;}
+      startBtn.textContent = 'Start Simulation';
+      startBtn.classList.remove('active');
+      burstBtn.classList.remove('active');
+    }
+
+    function reset(){
+      stop();
+      spent = 0; tokens = 0; requests = 0;
+      startTime = null; warnFired = false; denyFired = false;
+      alertEl.className = 'cost-alert';
+      logEl.innerHTML = '';
+      render();
+      addLog('Reset — counters zeroed');
+    }
+
+    startBtn.addEventListener('click', function(){
+      if(running) stop(); else start();
+    });
+    resetBtn.addEventListener('click', reset);
+    burstBtn.addEventListener('click', function(){
+      burstMode = !burstMode;
+      this.classList.toggle('active', burstMode);
+      if(burstMode){
+        addLog('BURST MODE — 10x token multiplier active');
+        if(!running) start();
+      } else {
+        addLog('Burst mode off — normal rate');
+      }
+    });
+
+    render();
+  })();
+
+
 })();
 </script>
 
